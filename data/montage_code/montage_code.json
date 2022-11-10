@@ -1,0 +1,70 @@
+{
+    "A1": [
+        "A1"
+    ],
+    "A2": [
+        "A2"
+    ],
+    "Abdo": [
+        "Abdominal"
+    ],
+    "C3": [
+        "C3"
+    ],
+    "C4": [
+        "C4"
+    ],
+    "EOGL": [
+        "LOC"
+    ],
+    "EOGR": [
+        "ROC"
+    ],
+    "LChin": [
+        "L Chin"
+    ],
+    "LegL": [
+        "Leg L"
+    ],
+    "LegR": [
+        "Leg R"
+    ],
+    "NasalP": [
+        "Cannula Flow"
+    ],
+    "RChin": [
+        "R Chin"
+    ],
+    "Thor": [
+        "Thoracic"
+    ],
+    "categories": [
+        "A1",
+        "A2",
+        "C3",
+        "C4",
+        "EOGL",
+        "EOGR",
+        "LChin",
+        "RChin",
+        "LegL",
+        "LegR",
+        "NasalP",
+        "Thor",
+        "Abdo"
+    ],
+    "edfFiles": [
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0013.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0012.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0009.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0001.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0015.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0003.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0014.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0006.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0019.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0005.edf",
+        "data/raw/polysomnography/edfs/visit1/mros-visit1-aa0018.edf"
+    ],
+    "pathname": "data/raw/"
+}
