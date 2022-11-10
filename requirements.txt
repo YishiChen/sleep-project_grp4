@@ -59,7 +59,6 @@ matplotlib==3.6.2
 matplotlib-inline==0.1.6
 mistune==2.0.4
 mne==1.2.1
--e git+https://github.com/Eortvald/micro-sleep-project.git@c91de3d0c53ee5730b0d26c758ffc379f8b55022#egg=mros_data
 multidict==6.0.2
 nbclassic==0.4.8
 nbclient==0.7.0
