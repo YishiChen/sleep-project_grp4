@@ -62,7 +62,7 @@ class PlottingMixin:
             S = stft(data[channel_idx], n_fft=nfft, hop_length=step_size, win_length=window_size)
             S_db = power_to_db(np.abs(S) ** 2, top_db=50) / 50
         else:
-            S_db = data
+            S_db = data[channel_idx]
             step_size = transform.step_size
             window_size = transform.segment_size
             nfft = transform.nfft
