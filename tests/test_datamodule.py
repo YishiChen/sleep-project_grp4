@@ -5,27 +5,27 @@ from mros_data.datamodule.transforms import MorletTransform, MultitaperTransform
 
 print("Setting up test")
 params = dict(
-    data_dir="data/processed/mros/lm",
+    data_dir="data/processed/mros/ar",
     batch_size=16,
     n_eval=2,
     n_test=2,
-    num_workers=4,
+    num_workers=0,
     seed=1337,
     # events={"ar": "Arousal", "lm": "Leg movement", "sdb": "Sleep-disordered breathing"},
-    # events={"ar": "Arousal"},
-    events={"lm": "Leg movement"},
+    events={"ar": "Arousal"},
+    #events={"lm": "Leg movement"},
     window_duration=600,  # seconds
     cache_data=True,
-    default_event_window_duration=[3],  # [10] for LM, [30] for SDB
+    default_event_window_duration=[15],  # [10] for LM, [30] for SDB
     event_buffer_duration=3,
     factor_overlap=2,
     fs=128,  # 64 for both LM and SDB
     matching_overlap=0.5,
     n_jobs=-1,
-    n_records=6,
-    # picks=["c3", "c4", "eogl", "eogr", "chin", "legl", "legr", "nasal", "abdo", "thor"],
-    # picks=["c3", "c4", "eogl", "eogr", "chin"],
-    picks=["legl", "legr"],
+    n_records=10,
+    #picks=["c3", "c4", "eogl", "eogr", "chin", "legl", "legr", "nasal", "abdo", "thor"],
+    picks=["c3", "c4", "eogl", "eogr", "chin"],
+    #picks=["legl", "legr"],
     # transform=MultitaperTransform(128, 0.5, 35.0, tw=8.0, normalize=True),
     transform=STFTTransform(
         fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024, normalize=True
