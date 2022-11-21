@@ -146,6 +146,8 @@ class SetCriterion(nn.Module):
            The target boxes are expected in format (center_x, center_y, w, h), normalized by the image size.
         """
         assert 'pred_boxes' in outputs
+
+        # TODO MAKE SURE MODEL DOESNT GET PUNISHED FOR Y-COORDINATE BOX.
         idx = self._get_src_permutation_idx(indices)
         src_boxes = outputs['pred_boxes'][idx]
         target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)
