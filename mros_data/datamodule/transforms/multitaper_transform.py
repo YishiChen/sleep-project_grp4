@@ -20,6 +20,7 @@ class MultitaperTransform:
         # self.nfft = nfft
         # self.freqs = np.linspace(self.fmin, self.fmax, endpoint=False)
         self.freqs = np.arange(self.fmin, self.fmax + 0.5, 0.5)
+        self.step_size = int(128*0.125)
         self.transform_fn = partial(
             tfr_array_multitaper,
             sfreq=self.fs,
@@ -48,3 +49,7 @@ class MultitaperTransform:
         axs[1].set(ylim=(self.freqs[0], self.freqs[-1]))
 
         return Cxx
+
+    def calculate_output_dims(self, window_size: int):
+        wd = window_size
+        return [513, 4801]

@@ -29,7 +29,7 @@ class STFTTransform:
 
     def __call__(self, X: np.ndarray, annotations: np.ndarray) -> np.ndarray:
 
-        Zxx = np.abs(self.transform_fn(X[0])) ** 2
+        Zxx = np.abs(self.transform_fn(X)) ** 2
         Zxx = librosa.power_to_db(Zxx, top_db=50) / 50
 
         # show a plot

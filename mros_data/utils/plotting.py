@@ -94,7 +94,7 @@ def plot_spectrogram(
         x_axis="time",
         ax=ax,
         fmin=fmin,
-        fmax=fmax,
+        fmax=fmax,cmap='magma'
     )
 
     return fig, ax

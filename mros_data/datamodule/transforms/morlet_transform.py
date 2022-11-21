@@ -43,3 +43,7 @@ class MorletTransform:
         axs[1].imshow(10 * np.log(Cxx), aspect="auto")  # , vmin=vmin, vmax=vmax)
 
         return Cxx
+
+    def calculate_output_dims(self, window_size: int):
+        wd = window_size
+        return [513, 4801]
