@@ -24,6 +24,9 @@ This README.md is currently under revision!
 ## Installation
 The data pipeline and datamodule can be installed into your virtual environment by `cd`'ing into project folder and running `pip`:
 ```bash
+mkdir <project_folder>
+cd <project_folder>
+git clone https://www.github.com/neergaard/mros-data.git
 cd mros-data
 pip install -e .
 ```

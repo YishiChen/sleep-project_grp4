@@ -188,7 +188,7 @@ class SleepEventDataset(RecordDataset, PlottingMixin, Dataset):
         return {
             "signal": signal,
             "events": events,
-            "stages": stages,
+            "stages": np.array(stages),
             # "record": self.index_to_record_event[idx]["record"],
             "record": self.index_to_record[idx]["record"],
             "localizations_target": localizations_target,
