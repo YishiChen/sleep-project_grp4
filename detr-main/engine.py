@@ -25,10 +25,14 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 10
 
-    for samples, targets in metric_logger.log_every(data_loader, print_freq, header):
+    for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
+
         samples = samples.to(device)
         ## TODO FIT TO DICTIONARY STRUCTURE OR CHANGE IT
-        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+        for i, target in enumerate(targets):
+            print(target, i)
+        #targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+        targets = [v.to(device) for v in targets]
 
         outputs = model(samples)
         loss_dict = criterion(outputs, targets)

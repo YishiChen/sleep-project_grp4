@@ -2,6 +2,7 @@
 import argparse
 import datetime
 import json
+import os
 import random
 import time
 from pathlib import Path
@@ -79,10 +80,11 @@ def get_args_parser():
                         help="Relative classification weight of the no-object class")
 
     # dataset parameters
+
     parser.add_argument('--dataset_file', default='coco')
-    parser.add_argument('--coco_path', type=str)
-    parser.add_argument('--coco_panoptic_path', type=str)
-    parser.add_argument('--remove_difficult', action='store_true')
+    #parser.add_argument('--coco_path', type=str,)
+    #parser.add_argument('--coco_panoptic_path', type=str)
+    #parser.add_argument('--remove_difficult', action='store_true')
 
     parser.add_argument('--output_dir', default='',
                         help='path where to save, empty for no saving')
@@ -141,8 +143,51 @@ def main(args):
 
 
     # ------------------ CHANGE DATASET CLASS ------------------- #
-    dataset_train = build_dataset(image_set='train', args=args)
-    dataset_val = build_dataset(image_set='val', args=args)
+
+    #dataset_train = build_dataset(image_set='train', args=args)
+    #dataset_val = build_dataset(image_set='val', args=args)
+    import os
+    from pathlib import Path
+    os.chdir(Path(os.path.abspath("")).parent)
+    from mros_data.datamodule import SleepEventDataModule
+    torch.cuda.empty_cache()
+
+    from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
+    params = dict(
+        data_dir="data/processed/mros/ar",
+        batch_size=2,
+        n_eval=2,
+        n_test=2,
+        num_workers=0,
+        seed=1337,
+        events={"ar": "Arousal"},
+        window_duration=600,  # seconds
+        cache_data=True,
+        default_event_window_duration=[15],
+        event_buffer_duration=3,
+        factor_overlap=2,
+        fs=128,
+        matching_overlap=0.5,
+        n_jobs=-1,
+        n_records=10,
+        #picks=["c3", "c4", "eogl", 'eogr', 'chin'],
+        picks=["c3", "eogl", "chin"],
+        # transform = None,
+        # transform = morlet_transform.MorletTransform(fs=128, fmin=0.5, fmax=35.0, nfft=1024),
+        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024,
+                                normalize=True),
+        # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
+        scaling="robust",
+    )
+
+    dm = SleepEventDataModule(**params)
+
+    from tqdm import tqdm
+
+    dm.setup('fit')
+    dataset_train = dm.train
+    dataset_val = dm.eval
+
     # ------------------ CHANGE DATASET CLASS ------------------- #
 
 
@@ -158,10 +203,13 @@ def main(args):
 
 
     # -------------------- CHANGE DATALOADER CLASS ------------------- #
-    data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
-                                   collate_fn=utils.collate_fn, num_workers=args.num_workers)
-    data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
-                                 drop_last=False, collate_fn=utils.collate_fn, num_workers=args.num_workers)
+    #data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
+    #                               collate_fn=utils.collate_fn, num_workers=args.num_workers)
+    #data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
+    #                             drop_last=False, collate_fn=utils.collate_fn, num_workers=args.num_workers)
+
+    data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
+
     # -------------------- CHANGE DATALOADER CLASS ------------------- #
 
 
@@ -177,6 +225,7 @@ def main(args):
         model_without_ddp.detr.load_state_dict(checkpoint['model'])
 
     output_dir = Path(args.output_dir)
+
     if args.resume:
         if args.resume.startswith('https'):
             checkpoint = torch.hub.load_state_dict_from_url(
