@@ -26,14 +26,27 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     print_freq = 10
 
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
-
+        targets_new = []
         samples = samples.to(device)
-        ## TODO FIT TO DICTIONARY STRUCTURE OR CHANGE IT
-        for i, target in enumerate(targets):
-            print(target, i)
-        #targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
-        targets = [v.to(device) for v in targets]
 
+        #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
+
+        for i, target in enumerate(targets):
+            boxes = target[:,:2]
+            if boxes.numel() == 0:
+                boxes = torch.zeros(0, 4)
+            else:
+                cxs = boxes.mean(dim=1)
+                cys = torch.zeros(cxs.size(dim=0))
+                ws = boxes[:, 1] - boxes[:, 0]
+                hs = torch.zeros(cxs.size(dim=0))
+                boxes = torch.column_stack((cxs, cys, ws, hs))
+            labels = target[:, 2].long()
+            dict = {'boxes': boxes, 'labels': labels}
+            targets_new.append(dict)
+
+
+        targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
         loss_dict = criterion(outputs, targets)
         weight_dict = criterion.weight_dict

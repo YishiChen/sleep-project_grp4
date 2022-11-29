@@ -152,10 +152,15 @@ def main(args):
     from mros_data.datamodule import SleepEventDataModule
     torch.cuda.empty_cache()
 
+    #from numba import cuda
+    #cuda.select_device(0)
+    #cuda.close()
+    #cuda.select_device(0)
+
     from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
     params = dict(
         data_dir="data/processed/mros/ar",
-        batch_size=2,
+        batch_size=1,
         n_eval=2,
         n_test=2,
         num_workers=0,
