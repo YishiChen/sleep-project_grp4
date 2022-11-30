@@ -24,7 +24,7 @@ def get_args_parser():
     parser.add_argument('--lr_backbone', default=1e-5, type=float)
     parser.add_argument('--batch_size', default=2, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
-    parser.add_argument('--epochs', default=300, type=int)
+    parser.add_argument('--epochs', default=1, type=int)
     parser.add_argument('--lr_drop', default=200, type=int)
     parser.add_argument('--clip_max_norm', default=0.1, type=float,
                         help='gradient clipping max norm')
@@ -146,27 +146,22 @@ def main(args):
 
     #dataset_train = build_dataset(image_set='train', args=args)
     #dataset_val = build_dataset(image_set='val', args=args)
+
     import os
     from pathlib import Path
     os.chdir(Path(os.path.abspath("")).parent)
     from mros_data.datamodule import SleepEventDataModule
-    torch.cuda.empty_cache()
-
-    #from numba import cuda
-    #cuda.select_device(0)
-    #cuda.close()
-    #cuda.select_device(0)
 
     from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
     params = dict(
         data_dir="data/processed/mros/ar",
-        batch_size=1,
+        batch_size=16,
         n_eval=2,
         n_test=2,
         num_workers=0,
         seed=1337,
         events={"ar": "Arousal"},
-        window_duration=600,  # seconds
+        window_duration=300,  # seconds
         cache_data=True,
         default_event_window_duration=[15],
         event_buffer_duration=3,
@@ -175,25 +170,20 @@ def main(args):
         matching_overlap=0.5,
         n_jobs=-1,
         n_records=10,
-        #picks=["c3", "c4", "eogl", 'eogr', 'chin'],
-        picks=["c3", "eogl", "chin"],
+        picks=["c3", "c4", "eogl", 'eogr', 'chin'],
+        #picks=["c3", "eogl", "chin"],
         # transform = None,
         # transform = morlet_transform.MorletTransform(fs=128, fmin=0.5, fmax=35.0, nfft=1024),
-        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024,
+        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 256), nfft=1024,
                                 normalize=True),
         # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
         scaling="robust",
     )
 
     dm = SleepEventDataModule(**params)
-
-    from tqdm import tqdm
-
     dm.setup('fit')
     dataset_train = dm.train
     dataset_val = dm.eval
-
-    # ------------------ CHANGE DATASET CLASS ------------------- #
 
 
     if args.distributed:
@@ -214,8 +204,6 @@ def main(args):
     #                             drop_last=False, collate_fn=utils.collate_fn, num_workers=args.num_workers)
 
     data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
-
-    # -------------------- CHANGE DATALOADER CLASS ------------------- #
 
 
     if args.dataset_file == "coco_panoptic":
@@ -252,6 +240,7 @@ def main(args):
 
     print("Start training")
     start_time = time.time()
+
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             sampler_train.set_epoch(epoch)

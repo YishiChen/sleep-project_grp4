@@ -10,7 +10,6 @@ import torchvision
 from torch import nn
 from torchvision.models._utils import IntermediateLayerGetter
 from typing import Dict, List
-
 from util.misc import NestedTensor, is_main_process
 
 from .position_encoding import build_position_encoding
@@ -66,11 +65,15 @@ class BackboneBase(nn.Module):
             return_layers = {"layer1": "0", "layer2": "1", "layer3": "2", "layer4": "3"}
         else:
             return_layers = {'layer4': "0"}
+        self.convint = torch.nn.Conv2d(5, 3, kernel_size=1)
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
         self.num_channels = num_channels
 
     def forward(self, tensor_list: NestedTensor):
-        xs = self.body(tensor_list.tensors)
+
+        #CONV TO GO FROM 5CHANNGELS TO 3CHANNELS
+        d3tens = self.convint(tensor_list.tensors)
+        xs = self.body(d3tens)
         out: Dict[str, NestedTensor] = {}
         for name, x in xs.items():
             m = tensor_list.mask
