@@ -67,10 +67,15 @@ class HungarianMatcher(nn.Module):
         # The 1 is a constant that doesn't change the matching, it can be ommitted.
         cost_class = -out_prob[:, tgt_ids]
 
+
+        # -- Make target y-coordinates equal to the predict to not punish model for y prediction -- #
         # Compute the L1 cost between boxes
-        cost_bbox = torch.cdist(out_bbox, tgt_bbox, p=1)
+        cost_bbox = torch.cdist(out_bbox[:, [0, 2]], tgt_bbox[:, [0, 2]], p=1)
 
         # Compute the giou cost betwen boxes
+        #tgt_bbox[:, [1, 3]] = 0
+        #out_bbox[:, [1, 3]] = 0
+        #print(tgt_bbox.shape, out_bbox.shape)
         cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(out_bbox), box_cxcywh_to_xyxy(tgt_bbox))
 
         # Final cost matrix

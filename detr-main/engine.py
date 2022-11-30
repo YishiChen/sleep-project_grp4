@@ -6,6 +6,7 @@ import math
 import os
 import sys
 from typing import Iterable
+import torchvision.transforms as T
 
 import torch
 
@@ -26,26 +27,27 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     print_freq = 10
 
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
+
         targets_new = []
-        samples = samples.to(device)
+        transre = T.Resize(size = (513, 600))
+        samples = transre(samples)
 
         #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
-
         for i, target in enumerate(targets):
             boxes = target[:,:2]
             if boxes.numel() == 0:
                 boxes = torch.zeros(0, 4)
             else:
                 cxs = boxes.mean(dim=1)
-                cys = torch.zeros(cxs.size(dim=0))
+                cys = torch.zeros(cxs.size(dim=0)).add(0.5)
                 ws = boxes[:, 1] - boxes[:, 0]
-                hs = torch.zeros(cxs.size(dim=0))
+                hs = torch.ones(cxs.size(dim=0))
                 boxes = torch.column_stack((cxs, cys, ws, hs))
             labels = target[:, 2].long()
             dict = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict)
 
-
+        samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
         loss_dict = criterion(outputs, targets)
@@ -90,9 +92,11 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('class_error', utils.SmoothedValue(window_size=1, fmt='{value:.2f}'))
     header = 'Test:'
+    print_freq = 10
 
     iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
-    coco_evaluator = CocoEvaluator(base_ds, iou_types)
+    coco_evaluator = None
+    # coco_evaluator = CocoEvaluator(base_ds, iou_types)
     # coco_evaluator.coco_eval[iou_types[0]].params.iouThrs = [0, 0.1, 0.5, 0.75]
 
     panoptic_evaluator = None
@@ -103,10 +107,31 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
             output_dir=os.path.join(output_dir, "panoptic_eval"),
         )
 
-    for samples, targets in metric_logger.log_every(data_loader, 10, header):
-        samples = samples.to(device)
-        targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
+    k = 0
+    for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq,
+                                                                 header=header):
 
+        targets_new = []
+        transre = T.Resize(size=(513, 600))
+        samples = transre(samples)
+        k += 1
+        # NEW TARGET IS LIST(DICTIONARY(TENSOR)))
+        for i, target in enumerate(targets):
+            boxes = target[:, :2]
+            if boxes.numel() == 0:
+                boxes = torch.zeros(0, 4)
+            else:
+                cxs = boxes.mean(dim=1)
+                cys = torch.zeros(cxs.size(dim=0)).add(0.5)
+                ws = boxes[:, 1] - boxes[:, 0]
+                hs = torch.ones(cxs.size(dim=0))
+                boxes = torch.column_stack((cxs, cys, ws, hs))
+            labels = target[:, 2].long()
+            dict = {'boxes': boxes, 'labels': labels, "orig_size": torch.tensor([513,4801]), "image_id": torch.tensor(k)}
+            targets_new.append(dict)
+
+        samples = samples.to(device)
+        targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
         loss_dict = criterion(outputs, targets)
         weight_dict = criterion.weight_dict
@@ -166,4 +191,5 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
         stats['PQ_all'] = panoptic_res["All"]
         stats['PQ_th'] = panoptic_res["Things"]
         stats['PQ_st'] = panoptic_res["Stuff"]
+    print()
     return stats, coco_evaluator

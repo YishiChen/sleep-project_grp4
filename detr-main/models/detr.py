@@ -40,6 +40,7 @@ class DETR(nn.Module):
         self.input_proj = nn.Conv2d(backbone.num_channels, hidden_dim, kernel_size=1)
         self.backbone = backbone
         self.aux_loss = aux_loss
+        self.convft = nn.Conv2d(5, 3, kernel_size=1)
 
     def forward(self, samples: NestedTensor):
         """ The forward expects a NestedTensor, which consists of:
@@ -147,12 +148,13 @@ class SetCriterion(nn.Module):
         """
         assert 'pred_boxes' in outputs
 
-        # TODO MAKE SURE MODEL DOESNT GET PUNISHED FOR Y-COORDINATE BOX.
         idx = self._get_src_permutation_idx(indices)
         src_boxes = outputs['pred_boxes'][idx]
         target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)
 
-        loss_bbox = F.l1_loss(src_boxes, target_boxes, reduction='none')
+
+        # -- Make the target equal to the prediction to not punish y-coordinate placement of box -- #
+        loss_bbox = F.l1_loss(src_boxes[:, [1, 3]], target_boxes[:, [1, 3]], reduction='none')
 
         losses = {}
         losses['loss_bbox'] = loss_bbox.sum() / num_boxes
