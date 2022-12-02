@@ -46,6 +46,7 @@ class SleepEventDataModule(LightningDataModule):
     n_test: int = 1000
     n_eval: int = 200
     seed: int = 1337
+    overfit: bool = False
 
     # Dataset specific
     events: dict = None
@@ -77,7 +78,7 @@ class SleepEventDataModule(LightningDataModule):
             n_records=self.n_records,
         )
         self.train_records = partitions["train"]
-        self.eval_records = partitions["eval"]
+        self.eval_records = partitions["eval"] if not self.overfit else partitions["train"]
         self.test_records = partitions["test"]
         self.n_classes = len(self.events.keys())
         self.n_channels = len(self.picks)
@@ -105,7 +106,7 @@ class SleepEventDataModule(LightningDataModule):
             scaling=self.scaling,
         )
 
-    def setup(self, stage: Optional[str] = None) -> None:
+    def setup(self, stage: Optional[str] = "fit") -> None:
 
         if stage == "fit":
             self.train = SleepEventDataset(self.train_records, **self.dataset_kwargs)
