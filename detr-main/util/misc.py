@@ -396,7 +396,8 @@ def get_rank():
 
 
 def is_main_process():
-    return get_rank() == 0
+    #return get_rank() == 0
+    return True
 
 
 def save_on_master(*args, **kwargs):
