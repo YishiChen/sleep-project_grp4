@@ -65,7 +65,7 @@ class BackboneBase(nn.Module):
             return_layers = {"layer1": "0", "layer2": "1", "layer3": "2", "layer4": "3"}
         else:
             return_layers = {'layer4': "0"}
-        self.convint = torch.nn.Conv2d(5, 3, kernel_size=1)
+        self.convint = torch.nn.Conv2d(5, 3, kernel_size=(3, 3))
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
         self.num_channels = num_channels
 
