@@ -9,11 +9,10 @@ from typing import Iterable
 import torchvision.transforms as T
 import numpy as np
 import torch
-
+import matplotlib.pyplot as plt
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
 from datasets.panoptic_eval import PanopticEvaluator
-
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
@@ -24,28 +23,26 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
     metric_logger.add_meter('class_error', utils.SmoothedValue(window_size=1, fmt='{value:.2f}'))
 
-
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 10
-
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
-
         targets_new = []
-        transre = T.Resize(size = (513, 513))
+
+        #transre = T.Resize(size=image_resize)
         #samples = transre(samples)
 
         #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
             boxes = target[:,:2]
             if boxes.numel() == 0:
-                boxes = torch.zeros(0, 4)
+                boxes = torch.tensor([0.5, 0.5, 1., 1.])
+                print("no events in this window")
             else:
                 cxs = boxes.mean(dim=1)
                 cys = torch.zeros(cxs.size(dim=0)).add(0.5)
                 ws = boxes[:, 1] - boxes[:, 0]
                 hs = torch.ones(cxs.size(dim=0))
                 boxes = torch.column_stack((cxs, cys, ws, hs))
-
             labels = target[:, 2].long()
             dict = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict)
@@ -67,6 +64,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
         loss_value = losses_reduced_scaled.item()
 
+
         if not math.isfinite(loss_value):
             print("Loss is {}, stopping training".format(loss_value))
             print(loss_dict_reduced)
@@ -81,6 +79,12 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         metric_logger.update(loss=loss_value, **loss_dict_reduced_scaled, **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
+
+    '''if epoch % 50 == 1:
+        path = os.getcwd() + '/pred_boxes/'
+        torch.save(outputs['pred_boxes'], path + str(epoch) + '_pred_boxes.pt')
+        torch.save(samples, path + str(epoch) + '_sample.pt')
+        torch.save(targets, path + str(epoch) + '_tgt_boxes.pt')'''
 
 
     # gather the stats from all processes
@@ -115,10 +119,9 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     k = 0
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq,
                                                                  header=header):
-
         targets_new = []
-        transre = T.Resize(size=(513, 600))
-        samples = transre(samples)
+        #transre = T.Resize(size=image_resize)
+        #samples = transre(samples)
         k += 1
         # NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
@@ -132,7 +135,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                 hs = torch.ones(cxs.size(dim=0))
                 boxes = torch.column_stack((cxs, cys, ws, hs))
             labels = target[:, 2].long()
-            dict = {'boxes': boxes, 'labels': labels, "orig_size": torch.tensor([513,4801]), "image_id": torch.tensor(k)}
+            dict = {'boxes': boxes, 'labels': labels, "orig_size": torch.tensor([513, 1201]), "image_id": torch.tensor(k)}
             targets_new.append(dict)
 
         samples = samples.to(device)

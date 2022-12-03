@@ -47,7 +47,7 @@ def generalized_box_iou(boxes1, boxes2):
     Returns a [N, M] pairwise matrix, where N = len(boxes1)
     and M = len(boxes2)
     """
-    # Change left-top corner y-coordinate to 1 and right-bottom corner y-coordinate to 0
+    # Change left-bot corner y-coordinate to 0 and right-top corner y-coordinate to 1
     boxes1[:, 1] = 0
     boxes1[:, 3] = 1
 
@@ -60,8 +60,6 @@ def generalized_box_iou(boxes1, boxes2):
 
     lt = torch.min(boxes1[:, None, :2], boxes2[:, :2])
     rb = torch.max(boxes1[:, None, 2:], boxes2[:, 2:])
-
-
 
     wh = (rb - lt).clamp(min=0)  # [N,M,2]
     area = wh[:, :, 0] * wh[:, :, 1]
