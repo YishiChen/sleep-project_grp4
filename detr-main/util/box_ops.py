@@ -50,6 +50,8 @@ def generalized_box_iou(boxes1, boxes2):
     # Change left-bot corner y-coordinate to 0 and right-top corner y-coordinate to 1
     boxes1[:, 1] = 0
     boxes1[:, 3] = 1
+    #boxes2[:, 1] = 0
+    #boxes2[:, 3] = 1
 
     # degenerate boxes gives inf / nan results
     # so do an early check
@@ -90,5 +92,9 @@ def masks_to_boxes(masks):
     y_mask = (masks * y.unsqueeze(0))
     y_max = y_mask.flatten(1).max(-1)[0]
     y_min = y_mask.masked_fill(~(masks.bool()), 1e8).flatten(1).min(-1)[0]
+
+    #Change masks to be full y-height.
+    y_min = 0
+    y_max = 1
 
     return torch.stack([x_min, y_min, x_max, y_max], 1)

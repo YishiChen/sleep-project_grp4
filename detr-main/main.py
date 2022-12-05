@@ -24,7 +24,7 @@ def get_args_parser():
     parser.add_argument('--lr_backbone', default=1e-5, type=float)
     parser.add_argument('--batch_size', default=2, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
-    parser.add_argument('--epochs', default=250, type=int)
+    parser.add_argument('--epochs', default=300, type=int)
     parser.add_argument('--lr_drop', default=200, type=int)
     parser.add_argument('--clip_max_norm', default=0.1, type=float,
                         help='gradient clipping max norm')
@@ -155,7 +155,7 @@ def main(args):
     from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
     params = dict(
         data_dir="data/processed/mros/ar",
-        batch_size=8,
+        batch_size=16,
         n_eval=2,
         n_test=2,
         num_workers=0,
@@ -174,10 +174,11 @@ def main(args):
         #picks=["c3", "eogl", "chin"],
         # transform = None,
         # transform = morlet_transform.MorletTransform(fs=128, fmin=0.5, fmax=35.0, nfft=1024),
-        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.25 * 128), nfft=512,
+        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.5 * 128), nfft=512,
                                 normalize=True),
         # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
         scaling="robust",
+        overfit=True
     )
 
     dm = SleepEventDataModule(**params)

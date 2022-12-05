@@ -153,8 +153,8 @@ class SetCriterion(nn.Module):
         target_boxes = torch.cat([t['boxes'][i] for t, (_, i) in zip(targets, indices)], dim=0)
 
 
-        # -- Make the target equal to the prediction to not punish y-coordinate placement of box -- #
-        loss_bbox = F.l1_loss(src_boxes[:, [1, 3]], target_boxes[:, [1, 3]], reduction='none')
+        # -- Only compare x-coordinates to not punish y-coordinate placement of box -- #
+        loss_bbox = F.l1_loss(src_boxes[:, [0, 2]], target_boxes[:, [0, 2]], reduction='none')
 
         losses = {}
         losses['loss_bbox'] = loss_bbox.sum() / num_boxes

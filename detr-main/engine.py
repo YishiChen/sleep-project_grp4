@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
 from datasets.panoptic_eval import PanopticEvaluator
-
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
                     device: torch.device, epoch: int, max_norm: float = 0):
@@ -28,24 +27,21 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
         targets_new = []
 
-        #transre = T.Resize(size=image_resize)
-        #samples = transre(samples)
-
         #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
             boxes = target[:,:2]
-            if boxes.numel() == 0:
-                boxes = torch.tensor([0.5, 0.5, 1., 1.])
-                print("no events in this window")
-            else:
+            if boxes.numel() > 0:
                 cxs = boxes.mean(dim=1)
                 cys = torch.zeros(cxs.size(dim=0)).add(0.5)
                 ws = boxes[:, 1] - boxes[:, 0]
                 hs = torch.ones(cxs.size(dim=0))
                 boxes = torch.column_stack((cxs, cys, ws, hs))
+            else:
+                boxes = torch.tensor([0.5, 0.5, 1., 1.])
+                print("no events in this window")
             labels = target[:, 2].long()
-            dict = {'boxes': boxes, 'labels': labels}
-            targets_new.append(dict)
+            dict_t = {'boxes': boxes, 'labels': labels}
+            targets_new.append(dict_t)
 
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
@@ -80,11 +76,12 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
-    '''if epoch % 50 == 1:
+    if epoch % 25 == 0 and epoch > 99:
         path = os.getcwd() + '/pred_boxes/'
         torch.save(outputs['pred_boxes'], path + str(epoch) + '_pred_boxes.pt')
         torch.save(samples, path + str(epoch) + '_sample.pt')
-        torch.save(targets, path + str(epoch) + '_tgt_boxes.pt')'''
+        torch.save(targets, path + str(epoch) + '_tgt_boxes.pt')
+        torch.save(outputs['pred_logits'], path + str(epoch) + '_pred_logits.pt')
 
 
     # gather the stats from all processes
@@ -120,8 +117,6 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq,
                                                                  header=header):
         targets_new = []
-        #transre = T.Resize(size=image_resize)
-        #samples = transre(samples)
         k += 1
         # NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
@@ -135,7 +130,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                 hs = torch.ones(cxs.size(dim=0))
                 boxes = torch.column_stack((cxs, cys, ws, hs))
             labels = target[:, 2].long()
-            dict = {'boxes': boxes, 'labels': labels, "orig_size": torch.tensor([513, 1201]), "image_id": torch.tensor(k)}
+            dict = {'boxes': boxes, 'labels': labels, "orig_size": torch.tensor(samples.shape[2:]), "image_id": torch.tensor(k)}
             targets_new.append(dict)
 
         samples = samples.to(device)

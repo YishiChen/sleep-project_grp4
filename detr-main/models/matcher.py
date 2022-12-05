@@ -70,6 +70,7 @@ class HungarianMatcher(nn.Module):
         # -- Make target y-coordinates equal to the predict to not punish model for y prediction -- #
         # Compute the L1 cost between boxes
         cost_bbox = torch.cdist(out_bbox[:, [0, 2]], tgt_bbox[:, [0, 2]], p=1)
+        #cost_bbox = torch.cdist(out_bbox, tgt_bbox, p=1)
 
         # Compute the giou cost betwen boxes
         cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(out_bbox), box_cxcywh_to_xyxy(tgt_bbox))
