@@ -48,8 +48,8 @@ def generalized_box_iou(boxes1, boxes2):
     and M = len(boxes2)
     """
     # Change left-bot corner y-coordinate to 0 and right-top corner y-coordinate to 1
-    boxes1[:, 1] = 0
-    boxes1[:, 3] = 1
+    #boxes1[:, 1] = 0
+    #boxes1[:, 3] = 1
     #boxes2[:, 1] = 0
     #boxes2[:, 3] = 1
 

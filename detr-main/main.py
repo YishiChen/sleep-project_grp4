@@ -53,7 +53,7 @@ def get_args_parser():
                         help="Dropout applied in the transformer")
     parser.add_argument('--nheads', default=8, type=int,
                         help="Number of attention heads inside the transformer's attentions")
-    parser.add_argument('--num_queries', default=10, type=int,
+    parser.add_argument('--num_queries', default=15, type=int,
                         help="Number of query slots")
     parser.add_argument('--pre_norm', action='store_true')
 
@@ -69,13 +69,13 @@ def get_args_parser():
                         help="Class coefficient in the matching cost")
     parser.add_argument('--set_cost_bbox', default=5, type=float,
                         help="L1 box coefficient in the matching cost")
-    parser.add_argument('--set_cost_giou', default=2, type=float,
+    parser.add_argument('--set_cost_giou', default=0, type=float,
                         help="giou box coefficient in the matching cost")
     # * Loss coefficients
     parser.add_argument('--mask_loss_coef', default=1, type=float)
     parser.add_argument('--dice_loss_coef', default=1, type=float)
     parser.add_argument('--bbox_loss_coef', default=5, type=float)
-    parser.add_argument('--giou_loss_coef', default=2, type=float)
+    parser.add_argument('--giou_loss_coef', default=0, type=float)
     parser.add_argument('--eos_coef', default=0.1, type=float,
                         help="Relative classification weight of the no-object class")
 
@@ -163,7 +163,7 @@ def main(args):
         events={"ar": "Arousal"},
         window_duration=600,  # seconds
         cache_data=True,
-        default_event_window_duration=[15],
+        default_event_window_duration=[3],
         event_buffer_duration=3,
         factor_overlap=2,
         fs=128,

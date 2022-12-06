@@ -92,6 +92,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
 @torch.no_grad()
 def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, output_dir):
+
     model.eval()
     criterion.eval()
 
@@ -101,9 +102,10 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     print_freq = 10
 
     iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
+
     coco_evaluator = None
-    # coco_evaluator = CocoEvaluator(base_ds, iou_types)
-    # coco_evaluator.coco_eval[iou_types[0]].params.iouThrs = [0, 0.1, 0.5, 0.75]
+    #coco_evaluator = CocoEvaluator(base_ds, iou_types)
+    #coco_evaluator.coco_eval[iou_types[0]].params.iouThrs = [0, 0.1, 0.5, 0.75]
 
     panoptic_evaluator = None
     if 'panoptic' in postprocessors.keys():
@@ -195,4 +197,5 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
         stats['PQ_th'] = panoptic_res["Things"]
         stats['PQ_st'] = panoptic_res["Stuff"]
     print()
+    coco_evaluator = None
     return stats, coco_evaluator
