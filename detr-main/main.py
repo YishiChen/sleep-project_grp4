@@ -53,7 +53,7 @@ def get_args_parser():
                         help="Dropout applied in the transformer")
     parser.add_argument('--nheads', default=8, type=int,
                         help="Number of attention heads inside the transformer's attentions")
-    parser.add_argument('--num_queries', default=15, type=int,
+    parser.add_argument('--num_queries', default=10, type=int,
                         help="Number of query slots")
     parser.add_argument('--pre_norm', action='store_true')
 
@@ -69,18 +69,17 @@ def get_args_parser():
                         help="Class coefficient in the matching cost")
     parser.add_argument('--set_cost_bbox', default=5, type=float,
                         help="L1 box coefficient in the matching cost")
-    parser.add_argument('--set_cost_giou', default=0, type=float,
+    parser.add_argument('--set_cost_giou', default=2, type=float,
                         help="giou box coefficient in the matching cost")
     # * Loss coefficients
-    parser.add_argument('--mask_loss_coef', default=1, type=float)
+    parser.add_argument('--mask_loss_coef', default=0, type=float)
     parser.add_argument('--dice_loss_coef', default=1, type=float)
     parser.add_argument('--bbox_loss_coef', default=5, type=float)
-    parser.add_argument('--giou_loss_coef', default=0, type=float)
+    parser.add_argument('--giou_loss_coef', default=2, type=float)
     parser.add_argument('--eos_coef', default=0.1, type=float,
                         help="Relative classification weight of the no-object class")
 
     # dataset parameters
-
     parser.add_argument('--dataset_file', default='mros')
     #parser.add_argument('--coco_path', type=str,)
     #parser.add_argument('--coco_panoptic_path', type=str)
@@ -169,7 +168,7 @@ def main(args):
         fs=128,
         matching_overlap=0.5,
         n_jobs=-1,
-        n_records=10,
+        n_records=20,
         picks=["c3", "c4", "eogl", 'eogr', 'chin'],
         #picks=["c3", "eogl", "chin"],
         # transform = None,
@@ -178,14 +177,14 @@ def main(args):
                                 normalize=True),
         # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
         scaling="robust",
-        overfit=True
+        #overfit=True
     )
 
     dm = SleepEventDataModule(**params)
     dm.setup('fit')
     dataset_train = dm.train
     dataset_val = dm.eval
-
+    base_ds = dm.eval
 
     if args.distributed:
         sampler_train = DistributedSampler(dataset_train)
@@ -200,19 +199,19 @@ def main(args):
 
     # -------------------- CHANGE DATALOADER CLASS ------------------- #
     #data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
-    #                               collate_fn=utils.collate_fn, num_workers=args.num_workers)
+    #                               collate_fn=utils.collate_fn, num_workers=0)
     #data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
-    #                             drop_last=False, collate_fn=utils.collate_fn, num_workers=args.num_workers)
+    #                             drop_last=False, collate_fn=utils.collate_fn, num_workers=0)
 
     data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
 
 
-    if args.dataset_file == "coco_panoptic":
+    '''if args.dataset_file == "coco_panoptic":
         # We also evaluate AP during panoptic training, on original coco DS
         coco_val = datasets.coco.build("val", args)
         base_ds = get_coco_api_from_dataset(coco_val)
     else:
-        base_ds = get_coco_api_from_dataset(dataset_val)
+        base_ds = get_coco_api_from_dataset(dataset_val)'''
 
     if args.frozen_weights is not None:
         checkpoint = torch.load(args.frozen_weights, map_location='cpu')
@@ -232,13 +231,13 @@ def main(args):
             lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
             args.start_epoch = checkpoint['epoch'] + 1
 
-    if args.eval:
-        test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
-                                              data_loader_val, base_ds, device, args.output_dir)
-        if args.output_dir:
-            utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")
-        return
-
+    #if args.eval:
+        #test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
+        #                                     data_loader_val, base_ds, device, args.output_dir)
+        #if args.output_dir:
+        #    utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")
+        #return
+    print(args.distributed)
     print("Start training")
     start_time = time.time()
 

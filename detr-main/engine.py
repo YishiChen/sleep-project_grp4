@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
 from datasets.panoptic_eval import PanopticEvaluator
+
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
                     device: torch.device, epoch: int, max_norm: float = 0):
@@ -26,20 +27,16 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     print_freq = 10
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
         targets_new = []
-
         #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
             boxes = target[:,:2]
-            if boxes.numel() > 0:
-                cxs = boxes.mean(dim=1)
-                cys = torch.zeros(cxs.size(dim=0)).add(0.5)
-                ws = boxes[:, 1] - boxes[:, 0]
-                hs = torch.ones(cxs.size(dim=0))
-                boxes = torch.column_stack((cxs, cys, ws, hs))
-            else:
-                boxes = torch.tensor([0.5, 0.5, 1., 1.])
-                print("no events in this window")
+            cxs = boxes.mean(dim=1)
+            cys = torch.zeros(cxs.size(dim=0)).add(0.5)
+            ws = boxes[:, 1] - boxes[:, 0]
+            hs = torch.ones(cxs.size(dim=0))
+            boxes = torch.column_stack((cxs, cys, ws, hs))
             labels = target[:, 2].long()
+
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)
 
@@ -93,47 +90,42 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 @torch.no_grad()
 def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, output_dir):
 
-    model.eval()
-    criterion.eval()
-
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('class_error', utils.SmoothedValue(window_size=1, fmt='{value:.2f}'))
     header = 'Test:'
     print_freq = 10
 
-    iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
-
     coco_evaluator = None
-    #coco_evaluator = CocoEvaluator(base_ds, iou_types)
-    #coco_evaluator.coco_eval[iou_types[0]].params.iouThrs = [0, 0.1, 0.5, 0.75]
 
-    panoptic_evaluator = None
+    '''
+    iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
+    coco_evaluator = CocoEvaluator(base_ds, iou_types)
+    coco_evaluator.coco_eval[iou_types[0]].params.iouThrs = [0, 0.1, 0.5, 0.75]
     if 'panoptic' in postprocessors.keys():
         panoptic_evaluator = PanopticEvaluator(
             data_loader.dataset.ann_file,
             data_loader.dataset.ann_folder,
             output_dir=os.path.join(output_dir, "panoptic_eval"),
-        )
+        )'''
 
-    k = 0
-    for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq,
-                                                                 header=header):
+    for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
         targets_new = []
-        k += 1
-        # NEW TARGET IS LIST(DICTIONARY(TENSOR)))
+
+        #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
-            boxes = target[:, :2]
-            if boxes.numel() == 0:
-                boxes = torch.zeros(0, 4)
-            else:
+            boxes = target[:,:2]
+            if boxes.numel() > 0:
                 cxs = boxes.mean(dim=1)
                 cys = torch.zeros(cxs.size(dim=0)).add(0.5)
                 ws = boxes[:, 1] - boxes[:, 0]
                 hs = torch.ones(cxs.size(dim=0))
                 boxes = torch.column_stack((cxs, cys, ws, hs))
+            else:
+                boxes = torch.tensor([0.5, 0.5, 1., 1.])
+                print("no events in this window")
             labels = target[:, 2].long()
-            dict = {'boxes': boxes, 'labels': labels, "orig_size": torch.tensor(samples.shape[2:]), "image_id": torch.tensor(k)}
-            targets_new.append(dict)
+            dict_t = {'boxes': boxes, 'labels': labels}
+            targets_new.append(dict_t)
 
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
@@ -152,12 +144,15 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                              **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
 
+        '''
         orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)
         results = postprocessors['bbox'](outputs, orig_target_sizes)
+        
         if 'segm' in postprocessors.keys():
             target_sizes = torch.stack([t["size"] for t in targets], dim=0)
             results = postprocessors['segm'](results, outputs, orig_target_sizes, target_sizes)
         res = {target['image_id'].item(): output for target, output in zip(targets, results)}
+        
         if coco_evaluator is not None:
             coco_evaluator.update(res)
 
@@ -170,10 +165,13 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                 res_pano[i]["file_name"] = file_name
 
             panoptic_evaluator.update(res_pano)
+    '''
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
+
+    '''
     if coco_evaluator is not None:
         coco_evaluator.synchronize_between_processes()
     if panoptic_evaluator is not None:
@@ -186,8 +184,11 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     panoptic_res = None
     if panoptic_evaluator is not None:
         panoptic_res = panoptic_evaluator.summarize()
+'''
+
     stats = {k: meter.global_avg for k, meter in metric_logger.meters.items()}
-    if coco_evaluator is not None:
+
+    '''if coco_evaluator is not None:
         if 'bbox' in postprocessors.keys():
             stats['coco_eval_bbox'] = coco_evaluator.coco_eval['bbox'].stats.tolist()
         if 'segm' in postprocessors.keys():
@@ -196,6 +197,5 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
         stats['PQ_all'] = panoptic_res["All"]
         stats['PQ_th'] = panoptic_res["Things"]
         stats['PQ_st'] = panoptic_res["Stuff"]
-    print()
-    coco_evaluator = None
+        '''
     return stats, coco_evaluator
