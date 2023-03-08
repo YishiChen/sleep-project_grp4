@@ -65,13 +65,12 @@ class HungarianMatcher(nn.Module):
         # Compute the classification cost. Contrary to the loss, we don't use the NLL,
         # but approximate it in 1 - proba[target class].
         # The 1 is a constant that doesn't change the matching, it can be ommitted.
-        cost_class = 1-out_prob[:, tgt_ids]
-
-        # -- Make target y-coordinates equal to the predict to not punish model for y prediction -- #
-        #cost_bbox = torch.cdist(out_bbox[:, [0, 2]], tgt_bbox[:, [0, 2]], p=1)
+        cost_class = -out_prob[:, tgt_ids]
 
         # Compute the L1 cost between boxes
-        cost_bbox = torch.cdist(out_bbox, tgt_bbox, p=1)
+        # cost_bbox = torch.cdist(out_bbox[:, [0, 2]], tgt_bbox, p=1)
+        # -- Make target y-coordinates equal to the predict to not punish model for y prediction -- #
+        cost_bbox = torch.cdist(out_bbox[:, [0, 2]], tgt_bbox[:, [0, 2]], p=1)
 
         # Compute the giou cost betwen boxes
         cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(out_bbox), box_cxcywh_to_xyxy(tgt_bbox))

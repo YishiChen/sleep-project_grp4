@@ -159,7 +159,7 @@ class SleepEventDataset(RecordDataset, PlottingMixin, Dataset):
                     (
                         valid_start,
                         valid_stop,
-                        event["label"] - event["label"],  # This is to ensure that the event label id is 0
+                        event["label"],  # This is to ensure that the event label id is 0
                     )
                 )  # Maybe add the non-event class?
 

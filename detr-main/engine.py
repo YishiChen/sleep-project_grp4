@@ -27,6 +27,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     print_freq = 10
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
         targets_new = []
+
         #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
             boxes = target[:,:2]
@@ -36,7 +37,6 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             hs = torch.ones(cxs.size(dim=0))
             boxes = torch.column_stack((cxs, cys, ws, hs))
             labels = target[:, 2].long()
-
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)
 
@@ -97,6 +97,9 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
 
     coco_evaluator = None
 
+    model.eval()
+    criterion.eval()
+
     '''
     iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
     coco_evaluator = CocoEvaluator(base_ds, iou_types)
@@ -114,15 +117,11 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
         #NEW TARGET IS LIST(DICTIONARY(TENSOR)))
         for i, target in enumerate(targets):
             boxes = target[:,:2]
-            if boxes.numel() > 0:
-                cxs = boxes.mean(dim=1)
-                cys = torch.zeros(cxs.size(dim=0)).add(0.5)
-                ws = boxes[:, 1] - boxes[:, 0]
-                hs = torch.ones(cxs.size(dim=0))
-                boxes = torch.column_stack((cxs, cys, ws, hs))
-            else:
-                boxes = torch.tensor([0.5, 0.5, 1., 1.])
-                print("no events in this window")
+            cxs = boxes.mean(dim=1)
+            cys = torch.zeros(cxs.size(dim=0)).add(0.5)
+            ws = boxes[:, 1] - boxes[:, 0]
+            hs = torch.ones(cxs.size(dim=0))
+            boxes = torch.column_stack((cxs, cys, ws, hs))
             labels = target[:, 2].long()
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)

@@ -7,9 +7,14 @@ from torchvision.ops.boxes import box_area
 
 
 def box_cxcywh_to_xyxy(x):
-    x_c, y_c, w, h = x.unbind(-1)
-    b = [(x_c - 0.5 * w), (y_c - 0.5 * h),
-         (x_c + 0.5 * w), (y_c + 0.5 * h)]
+    try:
+        x_c, y_c, w, h = x.unbind(-1)
+        b = [(x_c - 0.5 * w), (y_c - 0.5 * h),
+             (x_c + 0.5 * w), (y_c + 0.5 * h)]
+    except(ValueError):
+        x_c, w = x.unbind(-1)
+        b = [(x_c - 0.5 * w), (x_c + 0.5 * w)]
+
     return torch.stack(b, dim=-1)
 
 
@@ -23,18 +28,21 @@ def box_xyxy_to_cxcywh(x):
 # modified from torchvision to also return the union
 def box_iou(boxes1, boxes2):
 
-    area1 = box_area(boxes1)
-    area2 = box_area(boxes2)
+    # boxes1 = prediction_boxes
+    # boxes2 = target_boxes
 
-    lt = torch.max(boxes1[:, None, :2], boxes2[:, :2])  # [N,M,2]
-    rb = torch.min(boxes1[:, None, 2:], boxes2[:, 2:])  # [N,M,2]
+    length1 = boxes1[:, 2] - boxes1[:, 0]
+    length2 = boxes2[:, 1] - boxes2[:, 0]
 
-    wh = (rb - lt).clamp(min=0)  # [N,M,2]
-    inter = wh[:, :, 0] * wh[:, :, 1]  # [N,M]
+    lt = torch.max(boxes1[:, None, 0], boxes2[:, 0])
+    rb = torch.min(boxes1[:, None, 2], boxes2[:, 1])
 
-    union = area1[:, None] + area2 - inter
+    inter = (rb - lt).clamp(min=0)
+
+    union = length1[:, None] + length2 - inter
 
     iou = inter / union
+
     return iou, union
 
 
@@ -47,18 +55,20 @@ def generalized_box_iou(boxes1, boxes2):
     Returns a [N, M] pairwise matrix, where N = len(boxes1)
     and M = len(boxes2)
     """
+    # boxes1 = prediction_boxes
+    # boxes2 = target_boxes
+
     # degenerate boxes gives inf / nan results
     # so do an early check
-    assert (boxes1[:, 2:] >= boxes1[:, :2]).all()
-    assert (boxes2[:, 2:] >= boxes2[:, :2]).all()
+    assert (boxes1[:, 2] >= boxes1[:, 0]).all()
+    assert (boxes2[:, 2] >= boxes2[:, 0]).all()
 
     iou, union = box_iou(boxes1, boxes2)
 
-    lt = torch.min(boxes1[:, None, :2], boxes2[:, :2])
-    rb = torch.max(boxes1[:, None, 2:], boxes2[:, 2:])
+    lt = torch.min(boxes1[:, None, 0], boxes2[:, 0])
+    rb = torch.max(boxes1[:, None, 2], boxes2[:, 1])
 
-    wh = (rb - lt).clamp(min=0)  # [N,M,2]
-    area = wh[:, :, 0] * wh[:, :, 1]
+    area = (rb - lt).clamp(min=0)  # [N,M,2]
 
     return iou - (area - union) / area
 
