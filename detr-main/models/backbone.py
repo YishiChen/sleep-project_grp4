@@ -74,6 +74,9 @@ class BackboneBase(nn.Module):
         #CONV TO GO FROM 5CHANNGELS TO 3CHANNELS
         d3tens = self.convint(tensor_list.tensors)
         xs = self.body(d3tens)
+
+        #xs = self.body(tensor_list.tensors)
+
         out: Dict[str, NestedTensor] = {}
         for name, x in xs.items():
             m = tensor_list.mask
