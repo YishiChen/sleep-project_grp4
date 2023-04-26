@@ -41,7 +41,6 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             labels = target[:, 2].long()
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)
-
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
@@ -71,10 +70,11 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
         optimizer.step()
 
-        metric_logger.update(loss=loss_value, **loss_dict_reduced_scaled, **loss_dict_reduced_unscaled)
+        metric_logger.update(loss=sum(loss_dict_reduced_scaled.values()), **loss_dict_reduced_scaled, **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
-        wandb.log({"acc": loss_dict_reduced['class_error'] + 100, "loss": loss_value})
+
+        wandb.log({"train_loss": losses_reduced_scaled})
 
     if epoch % 25 == 0 and epoch > 99:
         path = os.getcwd() + '/pred_boxes/'
@@ -92,6 +92,8 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
 @torch.no_grad()
 def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, output_dir):
+    model.eval()
+    criterion.eval()
 
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('class_error', utils.SmoothedValue(window_size=1, fmt='{value:.2f}'))
@@ -99,9 +101,6 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
     print_freq = 10
 
     coco_evaluator = None
-
-    model.eval()
-    criterion.eval()
 
     '''
     iou_types = tuple(k for k in ('segm', 'bbox') if k in postprocessors.keys())
@@ -146,6 +145,8 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                              **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
 
+        wandb.log({"test_loss": loss_dict_reduced_scaled})
+
         '''
         orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)
         results = postprocessors['bbox'](outputs, orig_target_sizes)
@@ -154,7 +155,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
             target_sizes = torch.stack([t["size"] for t in targets], dim=0)
             results = postprocessors['segm'](results, outputs, orig_target_sizes, target_sizes)
         res = {target['image_id'].item(): output for target, output in zip(targets, results)}
-        
+    
         if coco_evaluator is not None:
             coco_evaluator.update(res)
 
