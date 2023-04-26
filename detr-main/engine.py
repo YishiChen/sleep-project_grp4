@@ -27,6 +27,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 10
+    CUDA_LAUNCH_BLOCKING = 1
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
         targets_new = []
 
