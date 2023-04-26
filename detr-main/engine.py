@@ -5,6 +5,7 @@ Train and eval functions used in main.py
 import math
 import os
 import sys
+import wandb
 from typing import Iterable
 import torchvision.transforms as T
 import numpy as np
@@ -13,6 +14,7 @@ import matplotlib.pyplot as plt
 import util.misc as utils
 from datasets.coco_eval import CocoEvaluator
 from datasets.panoptic_eval import PanopticEvaluator
+
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
@@ -72,6 +74,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         metric_logger.update(loss=loss_value, **loss_dict_reduced_scaled, **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
+        wandb.log({"acc": loss_dict_reduced['class_error'] + 100, "loss": loss_value})
 
     if epoch % 25 == 0 and epoch > 99:
         path = os.getcwd() + '/pred_boxes/'

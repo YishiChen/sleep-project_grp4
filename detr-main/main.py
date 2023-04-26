@@ -6,6 +6,7 @@ import os
 import random
 import time
 from pathlib import Path
+import wandb
 
 import numpy as np
 import torch
@@ -16,7 +17,6 @@ import util.misc as utils
 from datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch
 from models import build_model
-
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
@@ -178,6 +178,19 @@ def main(args):
         # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
         scaling="robust",
         #overfit=True
+    )
+
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project="my-awesome-project",
+
+        # track hyperparameters and run metadata
+        config={
+            "learning_rate": 1e-4,
+            "architecture": "DETR",
+            "dataset": "MROS",
+            "epochs": 300,
+        }
     )
 
     dm = SleepEventDataModule(**params)

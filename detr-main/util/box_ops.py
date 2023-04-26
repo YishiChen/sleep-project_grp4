@@ -27,15 +27,14 @@ def box_xyxy_to_cxcywh(x):
 
 # modified from torchvision to also return the union
 def box_iou(boxes1, boxes2):
-
     # boxes1 = prediction_boxes
     # boxes2 = target_boxes
 
     length1 = boxes1[:, 2] - boxes1[:, 0]
-    length2 = boxes2[:, 1] - boxes2[:, 0]
+    length2 = boxes2[:, 2] - boxes2[:, 0]
 
     lt = torch.max(boxes1[:, None, 0], boxes2[:, 0])
-    rb = torch.min(boxes1[:, None, 2], boxes2[:, 1])
+    rb = torch.min(boxes1[:, None, 2], boxes2[:, 2])
 
     inter = (rb - lt).clamp(min=0)
 
@@ -49,24 +48,19 @@ def box_iou(boxes1, boxes2):
 def generalized_box_iou(boxes1, boxes2):
     """
     Generalized IoU from https://giou.stanford.edu/
-
     The boxes should be in [x0, y0, x1, y1] format
-
     Returns a [N, M] pairwise matrix, where N = len(boxes1)
     and M = len(boxes2)
     """
-    # boxes1 = prediction_boxes
-    # boxes2 = target_boxes
-
-    # degenerate boxes gives inf / nan results
-    # so do an early check
+    # boxes1 = prediction_boxes -- boxes2 = target_boxes #
+    # degenerate boxes gives inf / nan results, so do an early check
     assert (boxes1[:, 2] >= boxes1[:, 0]).all()
     assert (boxes2[:, 2] >= boxes2[:, 0]).all()
 
     iou, union = box_iou(boxes1, boxes2)
 
     lt = torch.min(boxes1[:, None, 0], boxes2[:, 0])
-    rb = torch.max(boxes1[:, None, 2], boxes2[:, 1])
+    rb = torch.max(boxes1[:, None, 2], boxes2[:, 2])
 
     area = (rb - lt).clamp(min=0)  # [N,M,2]
 
