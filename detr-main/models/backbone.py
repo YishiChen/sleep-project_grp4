@@ -65,14 +65,17 @@ class BackboneBase(nn.Module):
             return_layers = {"layer1": "0", "layer2": "1", "layer3": "2", "layer4": "3"}
         else:
             return_layers = {'layer4': "0"}
+
+        self.convint2 = torch.nn.Conv2d(10, 5, kernel_size=(3, 3))
         self.convint = torch.nn.Conv2d(5, 3, kernel_size=(3, 3))
         self.body = IntermediateLayerGetter(backbone, return_layers=return_layers)
         self.num_channels = num_channels
 
     def forward(self, tensor_list: NestedTensor):
 
-        #CONV TO GO FROM 5CHANNGELS TO 3CHANNELS
-        d3tens = self.convint(tensor_list.tensors)
+        #CONV TO GO FROM 10 CHANNGELS TO 3 CHANNELS
+        d3tens = self.convint2(tensor_list.tensors)
+        d3tens = self.convint(d3tens)
         xs = self.body(d3tens)
 
         #xs = self.body(tensor_list.tensors)

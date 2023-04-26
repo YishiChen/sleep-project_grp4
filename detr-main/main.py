@@ -2,7 +2,7 @@
 import argparse
 import datetime
 import json
-import os
+#import os
 import random
 import time
 from pathlib import Path
@@ -12,9 +12,9 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, DistributedSampler
 
-import datasets
+#import datasets
 import util.misc as utils
-from datasets import build_dataset, get_coco_api_from_dataset
+#from datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch
 from models import build_model
 
@@ -58,7 +58,7 @@ def get_args_parser():
     parser.add_argument('--pre_norm', action='store_true')
 
     # * Segmentation
-    parser.add_argument('--masks', action='store_true',
+    parser.add_argument('--masks', #action='store_true',
                         help="Train segmentation head if the flag is provided")
 
     # Loss
@@ -153,13 +153,15 @@ def main(args):
 
     from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
     params = dict(
-        data_dir="data/processed/mros/ar",
-        batch_size=16,
-        n_eval=2,
-        n_test=2,
+        #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar",
+        data_dir="/scratch/s194277/mros/h5",
+        batch_size=4,
+        n_eval=4,
+        n_test=4,
         num_workers=0,
         seed=1338,
-        events={"ar": "Arousal"},
+        #events={"ar": "Arousal"},
+        events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
         window_duration=600,  # seconds
         cache_data=True,
         default_event_window_duration=[3],
@@ -169,11 +171,11 @@ def main(args):
         matching_overlap=0.5,
         n_jobs=-1,
         n_records=20,
-        picks=["c3", "c4", "eogl", 'eogr', 'chin'],
-        #picks=["c3", "eogl", "chin"],
+        #picks=["c3", "c4", "eogl", 'eogr', 'chin'],
+        picks=["c3", "eogl", "chin", 'eogr', 'chin', 'LegL', 'LegR', "nasal", "abdo", "thor"],
         # transform = None,
         # transform = morlet_transform.MorletTransform(fs=128, fmin=0.5, fmax=35.0, nfft=1024),
-        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.5 * 128), nfft=512,
+        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.25 * 128), nfft=512,
                                 normalize=True),
         # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
         scaling="robust",
@@ -182,7 +184,7 @@ def main(args):
 
     wandb.init(
         # set the wandb project where this run will be logged
-        project="Depslep",
+        project="titans_slep",
 
         # track hyperparameters and run metadata
         config={
@@ -197,7 +199,8 @@ def main(args):
     dm.setup('fit')
     dataset_train = dm.train
     dataset_val = dm.eval
-    base_ds = dm.eval
+    base_ds = None
+
 
     if args.distributed:
         sampler_train = DistributedSampler(dataset_train)
