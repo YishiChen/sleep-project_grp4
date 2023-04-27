@@ -75,14 +75,15 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
-        wandb.log({"train_loss": losses_reduced_scaled})
+        wandb.log({"loss": loss_dict_reduced_scaled})
 
-    if epoch % 25 == 0 and epoch > 99:
-        path = os.getcwd() + '/pred_boxes/'
+    if epoch % 25 == 0 and epoch > 49:
+        path = 'C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/pred_boxes/'
         torch.save(outputs['pred_boxes'], path + str(epoch) + '_pred_boxes.pt')
         torch.save(samples, path + str(epoch) + '_sample.pt')
         torch.save(targets, path + str(epoch) + '_tgt_boxes.pt')
         torch.save(outputs['pred_logits'], path + str(epoch) + '_pred_logits.pt')
+        print("SAVING")
 
 
     # gather the stats from all processes
@@ -146,7 +147,7 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                              **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
 
-        wandb.log({"test_loss": loss_dict_reduced_scaled})
+        wandb.log({"loss": loss_dict_reduced_scaled})
 
         '''
         orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)

@@ -153,9 +153,9 @@ def main(args):
 
     from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
     params = dict(
-        data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel",
+        #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel",
         #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar",
-        #data_dir="/scratch/s194277/mros/h5",
+        data_dir="/scratch/s194277/mros/h5",
         batch_size=16,
         n_eval=1,
         n_test=1,
@@ -176,7 +176,7 @@ def main(args):
         picks=["c3", "eogl", "chin", 'eogr', 'chin', 'legl', 'legl', "nasal", "abdo", "thor"],
         # transform = None,
         # transform = morlet_transform.MorletTransform(fs=128, fmin=0.5, fmax=35.0, nfft=1024),
-        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.5 * 128), nfft=512,
+        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024,
                                 normalize=True),
         # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
         scaling="robust",
@@ -185,7 +185,7 @@ def main(args):
 
     wandb.init(
         # set the wandb project where this run will be logged
-        project="titans_slep",
+        project="350subjects",
 
         # track hyperparameters and run metadata
         config={
