@@ -173,7 +173,7 @@ def main(args):
         n_jobs=-1,
         n_records=3,
         #picks=["c3", "c4", "eogl", 'eogr', 'chin'],
-        picks=["c3", "eogl", "chin", 'eogr', 'chin', 'legl', 'legl', "nasal", "abdo", "thor"],
+        picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
         # transform = None,
         # transform = morlet_transform.MorletTransform(fs=128, fmin=0.5, fmax=35.0, nfft=1024),
         transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024,
