@@ -97,14 +97,14 @@ def get_args_parser():
     parser.add_argument('--num_workers', default=2, type=int)
 
     # distributed training parameters
-    parser.add_argument('--world_size', default=1, type=int,
-                        help='number of distributed processes')
-    parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
+    #parser.add_argument('--world_size', default=1, type=int,
+    #                    help='number of distributed processes')
+    #parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
     return parser
 
 
 def main(args):
-    utils.init_distributed_mode(args)
+    #utils.init_distributed_mode(args)
     print("git:\n  {}\n".format(utils.get_sha()))
 
     if args.frozen_weights is not None:
@@ -123,9 +123,9 @@ def main(args):
     model.to(device)
 
     model_without_ddp = model
-    if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
-        model_without_ddp = model.module
+    #if args.distributed:
+    #    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
+    #    model_without_ddp = model.module
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('number of params:', n_parameters)
 
@@ -204,9 +204,11 @@ def main(args):
     base_ds = None
 
 
-    if args.distributed:
-        sampler_train = DistributedSampler(dataset_train)
-        sampler_val = DistributedSampler(dataset_val, shuffle=False)
+    #if args.distributed:
+    #    sampler_train = DistributedSampler(dataset_train)
+    #    sampler_val = DistributedSampler(dataset_val, shuffle=False)
+    if 4==1:
+        print('bingo bongo')
     else:
         sampler_train = torch.utils.data.RandomSampler(dataset_train)
         sampler_val = torch.utils.data.SequentialSampler(dataset_val)
@@ -255,13 +257,13 @@ def main(args):
         #if args.output_dir:
         #    utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")
         #return
-    print(args.distributed)
+    #print(args.distributed)
     print("Start training")
     start_time = time.time()
 
     for epoch in range(args.start_epoch, args.epochs):
-        if args.distributed:
-            sampler_train.set_epoch(epoch)
+        #if args.distributed:
+        #    sampler_train.set_epoch(epoch)
         train_stats = train_one_epoch(
             model, criterion, data_loader_train, optimizer, device, epoch,
             args.clip_max_norm)
