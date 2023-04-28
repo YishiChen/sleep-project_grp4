@@ -75,7 +75,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
     if epoch % 50 == 0 and epoch > 149:
-        path = '/sleep/sleep-project_grp4/detr_main'
+        path = '/detr_main'
         torch.save(outputs['pred_boxes'], path + str(epoch) + '_pred_boxes.pt')
         torch.save(samples, path + str(epoch) + '_sample.pt')
         torch.save(targets, path + str(epoch) + '_tgt_boxes.pt')
