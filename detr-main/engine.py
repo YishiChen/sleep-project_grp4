@@ -11,8 +11,9 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import util.misc as utils
-from datasets.coco_eval import CocoEvaluator
-from datasets.panoptic_eval import PanopticEvaluator
+
+#from datasets.coco_eval import CocoEvaluator
+#from datasets.panoptic_eval import PanopticEvaluator
 
 
 def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
@@ -74,7 +75,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
     if epoch % 50 == 0 and epoch > 149:
-        path = '/sleep/detr_main'
+        path = '/sleep/sleep-project_grp4/detr_main'
         torch.save(outputs['pred_boxes'], path + str(epoch) + '_pred_boxes.pt')
         torch.save(samples, path + str(epoch) + '_sample.pt')
         torch.save(targets, path + str(epoch) + '_tgt_boxes.pt')
