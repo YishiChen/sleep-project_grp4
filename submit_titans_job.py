@@ -7,11 +7,11 @@ JOBS = [
         "jobname": "depslep",
         "partition": "titans",
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
-        "time": "0-14:00:00",  # Days-Hours:Minutes:Seconds
+        "time": "0-00:01:00",  # Days-Hours:Minutes:Seconds
         "ncpus": 8,  # Number of CPU cores
         "gpus": 1,  # Number of GPUs
         "memory": "64G",  # This is total RAM, change this accordingly to use
-        "command": "python -m main.py",
+        "command": "python main.py",
         "log_path": "/scratch/s194277"  # Usually this is your scratch space
     },
 ]
@@ -36,7 +36,7 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 cd $HOME/s194277/sleep/sleep-project_grp4
 
 # Activate conda
-# source $GROUP_HOME/miniconda3/bin/activate
+source $GROUP_HOME/miniconda3/bin/activate
 
 # Activate correct conda environment
 conda activate bscslp
