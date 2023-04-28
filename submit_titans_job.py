@@ -11,7 +11,7 @@ JOBS = [
         "ncpus": 8,  # Number of CPU cores
         "gpus": 1,  # Number of GPUs
         "memory": "64G",  # This is total RAM, change this accordingly to use
-        "command": "python main.py",
+        "command": "python -m torch.distributed.launch main.py",
         "log_path": "/scratch/s194277"  # Usually this is your scratch space
     },
 ]
