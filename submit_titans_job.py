@@ -33,10 +33,11 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 ##################################################
 
 # Change this to correct directory
-cd $HOME/s194277/sleep/sleep-project_grp4
+cd $HOME/sleep/sleep-project_grp4/detr-main
 
 # Activate conda
-source $GROUP_HOME/miniconda3/bin/activate
+#source $GROUP_HOME/miniconda3/bin/activate
+source $HOME/opt/miniconda3
 
 # Activate correct conda environment
 conda activate bscslp
