@@ -37,7 +37,7 @@ cd $HOME/sleep/sleep-project_grp4/detr-main
 
 # Activate conda
 #source $GROUP_HOME/miniconda3/bin/activate
-source $GROUP_HOME/opt/miniconda3
+source $GROUP_HOME/opt/miniconda3/bin/activate
 
 # Activate correct conda environment
 conda activate bscslp
