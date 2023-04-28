@@ -5,7 +5,6 @@ Train and eval functions used in main.py
 import math
 import os
 import sys
-import wandb
 from typing import Iterable
 import torchvision.transforms as T
 import numpy as np
@@ -27,7 +26,6 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
     header = 'Epoch: [{}]'.format(epoch)
     print_freq = 10
-    CUDA_LAUNCH_BLOCKING = 1
     for samples, targets, records, *_ in metric_logger.log_every(iterable=data_loader, print_freq=print_freq, header=header):
         targets_new = []
 
@@ -75,16 +73,12 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
-        wandb.log({"loss": loss_dict_reduced_scaled})
-
-    if epoch % 25 == 0 and epoch > 49:
-        path = 'C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/pred_boxes/'
+    if epoch % 50 == 0 and epoch > 149:
+        path = '/sleep/detr_main'
         torch.save(outputs['pred_boxes'], path + str(epoch) + '_pred_boxes.pt')
         torch.save(samples, path + str(epoch) + '_sample.pt')
         torch.save(targets, path + str(epoch) + '_tgt_boxes.pt')
         torch.save(outputs['pred_logits'], path + str(epoch) + '_pred_logits.pt')
-        print("SAVING")
-
 
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
@@ -146,8 +140,6 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                              **loss_dict_reduced_scaled,
                              **loss_dict_reduced_unscaled)
         metric_logger.update(class_error=loss_dict_reduced['class_error'])
-
-        wandb.log({"loss": loss_dict_reduced_scaled})
 
         '''
         orig_target_sizes = torch.stack([t["orig_size"] for t in targets], dim=0)

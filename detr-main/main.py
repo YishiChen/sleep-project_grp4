@@ -22,7 +22,7 @@ def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lr_backbone', default=1e-5, type=float)
-    parser.add_argument('--batch_size', default=16, type=int)
+    parser.add_argument('--batch_size', default=2, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=300, type=int)
     parser.add_argument('--lr_drop', default=200, type=int)
@@ -85,7 +85,7 @@ def get_args_parser():
     #parser.add_argument('--coco_panoptic_path', type=str)
     #parser.add_argument('--remove_difficult', action='store_true')
 
-    parser.add_argument('--output_dir', default='C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/detr-main',
+    parser.add_argument('--output_dir', default='/sleep/detr-main',
                         help='path where to save, empty for no saving')
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
@@ -155,10 +155,11 @@ def main(args):
     params = dict(
         #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel",
         #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar",
-        data_dir="/scratch/s194277/mros/h5",
-        batch_size=16,
-        n_eval=1,
-        n_test=1,
+        #data_dir="/scratch/s194277/mros/h5",
+        data_dir="/scratch/aneol/detr-mros",
+        batch_size=2,
+        n_eval=567,
+        n_test=0,
         num_workers=0,
         seed=1338,
         #events={"ar": "Arousal"},
@@ -171,7 +172,7 @@ def main(args):
         fs=128,
         matching_overlap=0.5,
         n_jobs=-1,
-        n_records=3,
+        n_records=2835,
         #picks=["c3", "c4", "eogl", 'eogr', 'chin'],
         picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
         # transform = None,
@@ -185,14 +186,14 @@ def main(args):
 
     wandb.init(
         # set the wandb project where this run will be logged
-        project="350subjects",
+        project="Titanus",
 
         # track hyperparameters and run metadata
         config={
             "learning_rate": 1e-4,
             "architecture": "DETR",
             "dataset": "MROS",
-            "epochs": 300,
+            "epochs": 700,
         }
     )
 
@@ -282,6 +283,18 @@ def main(args):
         test_stats, coco_evaluator = evaluate(
             model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir
         )
+        wandb.log({
+            "train_loss": train_stats['loss'],
+            "train_class_error": train_stats['class_error'],
+            "train_loss_bbox": train_stats['loss_bbox'],
+            "train_loss_giou": train_stats['loss_giou']
+        })
+        wandb.log({
+            "test_loss": test_stats['loss'],
+            "test_class_error": test_stats['class_error'],
+            "test_loss_bbox": test_stats['loss_bbox'],
+            "test_loss_giou": test_stats['loss_giou']
+        })
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      **{f'test_{k}': v for k, v in test_stats.items()},
