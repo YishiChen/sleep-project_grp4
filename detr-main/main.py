@@ -17,6 +17,12 @@ import util.misc as utils
 #from datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch
 from models import build_model
+import os
+from pathlib import Path
+
+os.chdir(Path(os.path.abspath("")).parent)
+from sleep-project_grp4.mros_data.datamodule import SleepEventDataModule
+from sleep-project_grp4.mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
@@ -147,12 +153,6 @@ def main(args):
     #dataset_train = build_dataset(image_set='train', args=args)
     #dataset_val = build_dataset(image_set='val', args=args)
 
-    import os
-    from pathlib import Path
-    os.chdir(Path(os.path.abspath("")).parent)
-    from mros_data.datamodule import SleepEventDataModule
-
-    from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
     params = dict(
         #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel",
         #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar",
