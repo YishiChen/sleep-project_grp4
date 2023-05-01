@@ -21,8 +21,8 @@ import os
 from pathlib import Path
 
 os.chdir(Path(os.path.abspath("")).parent)
-from .mros_data.datamodule import SleepEventDataModule
-from .mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
+from mros_data.datamodule import SleepEventDataModule
+from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
