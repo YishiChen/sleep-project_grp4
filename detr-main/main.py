@@ -184,7 +184,7 @@ def main(args):
         scaling="robust",
         #overfit=True
     )
-
+    wandb.login(key=['5e435a892a1324586da2f4425116de5d843168f3'])
     wandb.init(
         # set the wandb project where this run will be logged
         project="Titanus",
