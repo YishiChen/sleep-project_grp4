@@ -23,6 +23,7 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 #
 #SBATCH --job-name={jobname}
 #SBATCH --time={time}
+#SBATCH -w {reservation}
 #SBATCH -p {partition}
 #SBATCH --cpus-per-task={ncpus}
 #SBATCH --gres=gpu:{gpus}
