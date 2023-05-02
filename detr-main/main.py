@@ -178,7 +178,7 @@ def main(args):
         n_jobs=-1,
         n_records=2831 if data_dir == "/scratch/aneol/detr-mros/" else 355,
         picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
-        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024,
+        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.25 * 128), nfft=1024,
                                 normalize=True),
         scaling="robust",
     )
