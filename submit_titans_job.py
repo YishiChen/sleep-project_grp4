@@ -4,15 +4,15 @@ import tempfile
 # fmt: off
 JOBS = [
     {
-        "jobname": "depslep",
+        "jobname": "depslep_2",
         "partition": "titans",
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
-        "time": "0-36:00:00",  # Days-Hours:Minutes:Seconds
+        "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
         "ncpus": 8,  # Number of CPU cores
         "gpus": 1,  # Number of GPUs
         "memory": "64G",  # This is total RAM, change this accordingly to use
         "command": "python -m torch.distributed.launch detr-main/main.py",
-        "log_path": "/scratch/s194277"  # Usually this is your scratch space
+        "log_path": "/scratch/s194277/new_hyper"  # Usually this is your scratch space
     },
 ]
 # fmt: on
@@ -24,6 +24,7 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 #SBATCH --job-name={jobname}
 #SBATCH --time={time}
 #SBATCH -p {partition}
+#SBATCH -w {reservation}
 #SBATCH --cpus-per-task={ncpus}
 #SBATCH --gres=gpu:{gpus}
 #SBATCH --mem={memory}
@@ -35,7 +36,7 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 cd $HOME/sleep/sleep-project_grp4
 
 # Activate conda
-#source $GROUP_HOME/miniconda3/bin/activate
+# source $GROUP_HOME/miniconda3/bin/activate
 source $GROUP_HOME/opt/miniconda3/bin/activate
 
 # Activate correct conda environment

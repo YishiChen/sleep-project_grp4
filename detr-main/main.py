@@ -26,12 +26,12 @@ from mros_data.datamodule.transforms import STFTTransform, morlet_transform, mul
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
-    parser.add_argument('--lr', default=1e-4, type=float)
-    parser.add_argument('--lr_backbone', default=1e-5, type=float)
-    parser.add_argument('--batch_size', default=2, type=int)
+    parser.add_argument('--lr', default=1e-3, type=float)
+    parser.add_argument('--lr_backbone', default=1e-4, type=float)
+    parser.add_argument('--batch_size', default=8, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
-    parser.add_argument('--epochs', default=300, type=int)
-    parser.add_argument('--lr_drop', default=200, type=int)
+    parser.add_argument('--epochs', default=150, type=int)
+    parser.add_argument('--lr_drop', default=100, type=int)
     parser.add_argument('--clip_max_norm', default=0.1, type=float,
                         help='gradient clipping max norm')
 
@@ -64,7 +64,7 @@ def get_args_parser():
     parser.add_argument('--pre_norm', action='store_true')
 
     # * Segmentation
-    parser.add_argument('--masks', #action='store_true',
+    parser.add_argument('--masks', default=None, action='store_true',
                         help="Train segmentation head if the flag is provided")
 
     # Loss
@@ -153,36 +153,34 @@ def main(args):
     #dataset_train = build_dataset(image_set='train', args=args)
     #dataset_val = build_dataset(image_set='val', args=args)
 
+    # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel",
+    # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar",
+    # data_dir="/scratch/s194277/mros/h5",
+    # data_dir="/scratch/aneol/detr-mros/",
+    #data_dir = "/scratch/s194277/mros/h5"
+    data_dir = "/scratch/aneol/detr-mros/"
+
     params = dict(
-        #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel",
-        #data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar",
-        data_dir="/scratch/s194277/mros/h5",
-        #data_dir="/scratch/aneol/detr-mros/",
-        batch_size=2,
-        n_eval=71,
-        n_test=0,
+        data_dir=data_dir,
+        batch_size=args.batch_size,
+        n_eval=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
+        n_test=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
         num_workers=0,
         seed=1338,
-        #events={"ar": "Arousal"},
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
         window_duration=600,  # seconds
         cache_data=True,
-        default_event_window_duration=[3],
+        default_event_window_duration=[3, 15, 30],
         event_buffer_duration=3,
         factor_overlap=2,
         fs=128,
         matching_overlap=0.5,
         n_jobs=-1,
-        n_records=355,
-        #picks=["c3", "c4", "eogl", 'eogr', 'chin'],
+        n_records=2831 if data_dir == "/scratch/aneol/detr-mros/" else 355,
         picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
-        # transform = None,
-        # transform = morlet_transform.MorletTransform(fs=128, fmin=0.5, fmax=35.0, nfft=1024),
         transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.125 * 128), nfft=1024,
                                 normalize=True),
-        # transform = multitaper_transform.MultitaperTransform(fs=128, fmin=0.5, fmax=35, tw=8.0, normalize=True),
         scaling="robust",
-        #overfit=True
     )
     wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
     wandb.init(
@@ -191,10 +189,9 @@ def main(args):
 
         # track hyperparameters and run metadata
         config={
-            "learning_rate": 1e-4,
             "architecture": "DETR",
             "dataset": "MROS",
-            "epochs": 700,
+            "epochs": args.epoch,
         }
     )
 
@@ -256,7 +253,8 @@ def main(args):
         #if args.output_dir:
         #    utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")
         #return
-    #print(args.distributed)
+
+    print(args.distributed)
     print("Start training")
     start_time = time.time()
 
@@ -270,7 +268,7 @@ def main(args):
         if args.output_dir:
             checkpoint_paths = [output_dir / 'checkpoint.pth']
             # extra checkpoint before LR drop and every 100 epochs
-            if (epoch + 1) % args.lr_drop == 0 or (epoch + 1) % 100 == 0:
+            if (epoch + 1) % args.lr_drop == 0 or (epoch + 1) % 10 == 0:
                 checkpoint_paths.append(output_dir / f'checkpoint{epoch:04}.pth')
             for checkpoint_path in checkpoint_paths:
                 utils.save_on_master({
