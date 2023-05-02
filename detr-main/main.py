@@ -170,7 +170,7 @@ def main(args):
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
         window_duration=600,  # seconds
         cache_data=True,
-        default_event_window_duration=[3, 15, 30],
+        default_event_window_duration=[3],
         event_buffer_duration=3,
         factor_overlap=2,
         fs=128,
