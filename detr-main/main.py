@@ -191,7 +191,7 @@ def main(args):
         config={
             "architecture": "DETR",
             "dataset": "MROS",
-            "epochs": args.epoch,
+            "epochs": args.epochs,
         }
     )
 
