@@ -23,6 +23,7 @@ from pathlib import Path
 os.chdir(Path(os.path.abspath("")).parent)
 from mros_data.datamodule import SleepEventDataModule
 from mros_data.datamodule.transforms import STFTTransform, morlet_transform, multitaper_transform
+from mros_data.utils import collate
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
@@ -103,7 +104,7 @@ def get_args_parser():
     parser.add_argument('--num_workers', default=2, type=int)
 
     # distributed training parameters
-    parser.add_argument('--world_size', default=1, type=int,
+    parser.add_argument('--world_size', default=8, type=int,
                         help='number of distributed processes')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
     parser.add_argument('--local_rank', default=0, help='just a dummy to start training')
@@ -153,10 +154,10 @@ def main(args):
     #dataset_train = build_dataset(image_set='train', args=args)
     #dataset_val = build_dataset(image_set='val', args=args)
 
-    # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel",
-    # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar",
-    # data_dir="/scratch/s194277/mros/h5",
-    # data_dir="/scratch/aneol/detr-mros/",
+    #data_dir = "C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/10channel"
+    # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
+    # data_dir="/scratch/s194277/mros/h5"
+    # data_dir="/scratch/aneol/detr-mros/"
     #data_dir = "/scratch/s194277/mros/h5"
     data_dir = "/scratch/aneol/detr-mros/"
 
@@ -178,7 +179,7 @@ def main(args):
         n_jobs=-1,
         n_records=2831 if data_dir == "/scratch/aneol/detr-mros/" else 355,
         picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
-        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.25 * 128), nfft=1024,
+        transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.5 * 128), nfft=1024,
                                 normalize=True),
         scaling="robust",
     )
@@ -214,12 +215,12 @@ def main(args):
 
 
     # -------------------- CHANGE DATALOADER CLASS ------------------- #
-    #data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
-    #                               collate_fn=utils.collate_fn, num_workers=0)
-    #data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
-    #                             drop_last=False, collate_fn=utils.collate_fn, num_workers=0)
+    data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
+                                   collate_fn=collate, num_workers=0)
+    data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
+                                 drop_last=False, collate_fn=collate, num_workers=0)
 
-    data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
+    #data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
 
 
     '''if args.dataset_file == "coco_panoptic":

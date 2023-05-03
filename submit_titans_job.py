@@ -8,9 +8,9 @@ JOBS = [
         "partition": "titans",
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
-        "ncpus": 64,  # Number of CPU cores
-        "gpus": 8,  # Number of GPUs
-        "memory": "512G",  # This is total RAM, change this accordingly to use
+        "ncpus": 16,  # Number of CPU cores
+        "gpus": 6,  # Number of GPUs
+        "memory": "256G",  # This is total RAM, change this accordingly to use
         "command": "python -m torch.distributed.launch detr-main/main.py",
         "log_path": "/scratch/s194277"  # Usually this is your scratch space
     },
