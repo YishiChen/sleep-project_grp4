@@ -39,9 +39,15 @@ def plot_data(
 
     # Plot events
     for event_label in np.unique(events[:, -1]):
+        if event_label == 0.0:
+            color = "r"
+        elif event_label == 1.0:
+            color = "yellow"
+        elif event_label == 2.0:
+            color = "cornflowerblue"
         class_events = events[events[:, -1] == event_label, :-1] * T / fs
         for evt_start, evt_stop in class_events:
-            ax.axvspan(evt_start, evt_stop, facecolor="r", alpha=0.5, edgecolor=None)
+            ax.axvspan(evt_start, evt_stop, facecolor=color, alpha=0.6, edgecolor=None)
 
     # Calculate the offset between signals
     data = (
