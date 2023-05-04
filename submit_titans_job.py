@@ -11,7 +11,7 @@ JOBS = [
         "ncpus": 24,  # Number of CPU cores
         "gpus": 6,  # Number of GPUs
         "memory": "64G",  # This is total RAM, change this accordingly to use
-        "command": "python -m torch.distributed.launch --world_size=6 detr-main/main.py",
+        "command": "python -m torch.distributed.launch world_size=6 detr-main/main.py",
         "log_path": "/scratch/s194277/new_hyper"  # Usually this is your scratch space
 
     },
