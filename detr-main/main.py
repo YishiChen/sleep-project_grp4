@@ -27,8 +27,8 @@ from mros_data.utils import collate
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
-    parser.add_argument('--lr', default=1e-3, type=float)
-    parser.add_argument('--lr_backbone', default=1e-3, type=float)
+    parser.add_argument('--lr', default=1e-4, type=float)
+    parser.add_argument('--lr_backbone', default=1e-4, type=float)
     parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=150, type=int)
@@ -187,18 +187,20 @@ def main(args):
         #transform=None,
         scaling="robust",
     )
-    '''wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
+    wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
     wandb.init(
         # set the wandb project where this run will be logged
         project="Custom_backbone",
 
         # track hyperparameters and run metadata
         config={
+            "lr": args.lr,
+            "lr_drop": args.lr_drop,
             "architecture": "DETR",
             "dataset": "MROS",
             "epochs": args.epochs,
         }
-    )'''
+    )
 
     dm = SleepEventDataModule(**params)
     dm.setup('fit')
