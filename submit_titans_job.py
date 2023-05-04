@@ -4,7 +4,7 @@ import tempfile
 # fmt: off
 JOBS = [
     {
-        "jobname": "depslep_2",
+        "jobname": "dep_over",
         "partition": "titans",
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
@@ -12,7 +12,7 @@ JOBS = [
         "gpus": 1,  # Number of GPUs
         "memory": "64G",  # This is total RAM, change this accordingly to use
         "command": "python -m torch.distributed.launch detr-main/main.py",
-        "log_path": "/scratch/s194277"  # Usually this is your scratch space
+        "log_path": "/scratch/s194277/overfit"  # Usually this is your scratch space
     },
 ]
 # fmt: on
