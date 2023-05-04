@@ -27,8 +27,8 @@ from mros_data.utils import collate
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
-    parser.add_argument('--lr', default=1e-4, type=float)
-    parser.add_argument('--lr_backbone', default=1e-4, type=float)
+    parser.add_argument('--lr', default=1e-3, type=float)
+    parser.add_argument('--lr_backbone', default=1e-3, type=float)
     parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=150, type=int)
@@ -158,8 +158,8 @@ def main(args):
     # data_dir="C:/Users/Nullerh/Documents/DTU_SCHOOL_WORK/Semester7/sleep/data/processed/mros/ar"
     # data_dir="/scratch/s194277/mros/h5"
     # data_dir="/scratch/aneol/detr-mros/"
-    data_dir = "/scratch/s194277/mros/h5"
-    #data_dir = "/scratch/aneol/detr-mros/"
+    #data_dir = "/scratch/s194277/mros/h5"
+    data_dir = "/scratch/aneol/detr-mros/"
 
     params = dict(
         data_dir=data_dir,
@@ -180,7 +180,7 @@ def main(args):
         matching_overlap=0.5,
         n_jobs=-1,
         #n_records=2831 if data_dir == "/scratch/aneol/detr-mros/" else 355,
-        n_records=355,
+        n_records=350,
         picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
         transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.5 * 128), nfft=1024,
                                 normalize=True),
@@ -190,7 +190,7 @@ def main(args):
     wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
     wandb.init(
         # set the wandb project where this run will be logged
-        project="Custom_backbone",
+        project='350 sub',
 
         # track hyperparameters and run metadata
         config={
@@ -199,6 +199,7 @@ def main(args):
             "architecture": "DETR",
             "dataset": "MROS",
             "epochs": args.epochs,
+            "batch_size": args.batch_size
         }
     )
 
