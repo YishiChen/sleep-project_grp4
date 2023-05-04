@@ -190,7 +190,7 @@ def main(args):
     wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
     wandb.init(
         # set the wandb project where this run will be logged
-        project='350 sub',
+        project='Run with 4 GPU',
 
         # track hyperparameters and run metadata
         config={
