@@ -4,7 +4,7 @@ import tempfile
 # fmt: off
 JOBS = [
     {
-        "jobname": "dep_6",
+        "jobname": "6_world_dep",
         "partition": "titans",
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
