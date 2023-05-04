@@ -34,7 +34,7 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 ##################################################
 
 # Change this to correct directory
-cd $HOME/sleep/sleep-project_grp4
+cd $HOME/bachelor/sleep-project_grp4
 
 # Activate conda
 # source $GROUP_HOME/miniconda3/bin/activate
