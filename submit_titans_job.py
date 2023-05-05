@@ -9,9 +9,9 @@ JOBS = [
         "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
         "ncpus": 4,  # Number of CPU cores
-        "gpus": 2,  # Number of GPUs
+        "gpus": 1,  # Number of GPUs
         "memory": "128G",  # This is total RAM, change this accordingly to use
-        "command": "python -m torch.distributed.launch --nproc_per_node=2 --use_env detr-main/main.py",
+        "command": "python -m torch.distributed.launch --nproc_per_node=1 --use_env detr-main/main.py",
         "log_path": "/scratch/s203877"  # Usually this is your scratch space
 
     },
