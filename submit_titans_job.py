@@ -11,7 +11,7 @@ JOBS = [
         "ncpus": 4,  # Number of CPU cores
         "gpus": 2,  # Number of GPUs
         "memory": "256G",  # This is total RAM, change this accordingly to use
-        "command": "python -m torch.distributed.launch --nproc_per_node=2 --nthreads=10 --use_env detr-main/main.py",
+        "command": "python -m torch.distributed.launch --nproc_per_node=2  --use_env detr-main/main.py",
         "log_path": "/scratch/s203877"  # Usually this is your scratch space
 
     },
@@ -27,6 +27,7 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 #SBATCH -p {partition}
 #SBATCH --cpus-per-task={ncpus}
 #SBATCH --gres=gpu:{gpus}
+#SBATCH --nthreads=10
 #SBATCH --ntasks-per-node={gpus}
 #SBATCH --mem={memory}
 #SBATCH --output={log_path}/{jobname}.out
