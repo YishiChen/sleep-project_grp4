@@ -118,7 +118,7 @@ def main(args):
 
     sharing_strategy = "file_system"
     torch.multiprocessing.set_sharing_strategy(sharing_strategy)
-
+    torch.multiprocessing.set_start_method('forkserver')
 
     print("git:\n  {}\n".format(utils.get_sha()))
 
@@ -235,6 +235,7 @@ def main(args):
 
     def set_worker_sharing_strategy(worker_id: int) -> None:
         torch.multiprocessing.set_sharing_strategy("file_system")
+        torch.multiprocessing.set_start_method('forkserver')
 
 
     data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
