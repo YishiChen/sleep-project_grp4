@@ -116,9 +116,8 @@ def main(args):
     
     
 
-    sharing_strategy = "file_system"
-    torch.multiprocessing.set_sharing_strategy(sharing_strategy)
-    torch.multiprocessing.set_start_method('forkserver')
+    
+    torch.multiprocessing.set_sharing_strategy("file_system")
 
     print("git:\n  {}\n".format(utils.get_sha()))
 
