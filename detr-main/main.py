@@ -113,6 +113,10 @@ def get_args_parser():
 
 def main(args):
     utils.init_distributed_mode(args)
+
+    sharing_strategy = "file_system"
+    torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+    
     print("git:\n  {}\n".format(utils.get_sha()))
 
     if args.frozen_weights is not None:
@@ -223,8 +227,7 @@ def main(args):
 
     # -------------------- CHANGE DATALOADER CLASS ------------------- #
 
-    sharing_strategy = "file_system"
-    torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+    
 
 
     def set_worker_sharing_strategy(worker_id: int) -> None:
