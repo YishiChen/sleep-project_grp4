@@ -113,11 +113,12 @@ def get_args_parser():
 
 def main(args):
     utils.init_distributed_mode(args)
-    print("LOLOLOOLO", torch.multiprocessing.get_sharing_strategy())
+    
     
 
     sharing_strategy = "file_system"
     torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+
 
     print("git:\n  {}\n".format(utils.get_sha()))
 
@@ -240,6 +241,7 @@ def main(args):
                                    collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
     data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
                                  drop_last=False, collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
+    print("LOLOLOOLO", torch.multiprocessing.get_sharing_strategy())
 
     #data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
 
