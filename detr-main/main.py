@@ -231,15 +231,14 @@ def main(args):
 
 
     def set_worker_sharing_strategy(worker_id: int) -> None:
-        torch.multiprocessing.set_sharing_strategy(sharing_strategy)
+        torch.multiprocessing.set_sharing_strategy("file_system")
 
 
     data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
                                    collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
     data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
                                  drop_last=False, collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
-    print(torch.multiprocessing.get_sharing_strategy())
-    raise
+
     #data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
 
 
