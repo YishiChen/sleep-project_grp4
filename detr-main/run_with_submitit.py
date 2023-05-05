@@ -5,6 +5,8 @@ A script to run multinode training with submitit.
 import argparse
 import os
 import uuid
+import sys
+
 from pathlib import Path
 
 import main as detection
@@ -47,6 +49,7 @@ class Trainer(object):
         self.args = args
 
     def __call__(self):
+        sys.path.append('/home/s203877/bachelor/sleep-project_grp4/detr-main')
         import main as detection
 
         self._setup_gpu_args()
