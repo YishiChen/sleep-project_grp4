@@ -107,7 +107,7 @@ def get_args_parser():
     parser.add_argument('--world_size', default=6, type=int,
                         help='number of distributed processes')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
-    parser.add_argument('--local_rank', default='Suck my penis', help='just a dummy to start training')
+    parser.add_argument('--local_rank', default='0', help='just a dummy to start training')
     return parser
 
 
