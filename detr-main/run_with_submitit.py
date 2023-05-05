@@ -27,7 +27,7 @@ def get_shared_folder() -> Path:
     #     p = Path(f"/checkpoint/{user}/experiments")
     #     p.mkdir(exist_ok=True)
     #     return p
-    p = Path(f"$HOME/bachelor/checkpoint")
+    p = Path(f"/home/s203877/bachelor/checkpoint")
     p.mkdir(exist_ok=True)
     return p
     raise RuntimeError("No shared folder available")
