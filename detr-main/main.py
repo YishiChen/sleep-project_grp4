@@ -184,7 +184,7 @@ def main(args):
         factor_overlap=2,
         fs=128,
         matching_overlap=0.5,
-        n_jobs=1,
+        n_jobs=-1,
         #n_records=2831 if data_dir == "/scratch/aneol/detr-mros/" else 355,
         n_records=350,
         picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
