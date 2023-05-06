@@ -27,9 +27,9 @@ from mros_data.utils import collate
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
-    parser.add_argument('--lr', default=1e-3, type=float)
-    parser.add_argument('--lr_backbone', default=1e-3, type=float)
-    parser.add_argument('--batch_size', default=2, type=int)
+    parser.add_argument('--lr', default=1e-4, type=float)
+    parser.add_argument('--lr_backbone', default=1e-4, type=float)
+    parser.add_argument('--batch_size', default=16, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=150, type=int)
     parser.add_argument('--lr_drop', default=100, type=int)
@@ -170,10 +170,8 @@ def main(args):
     params = dict(
         data_dir=data_dir,
         batch_size=args.batch_size,
-        #n_eval=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
-        #n_test=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
-        n_test=50,
-        n_eval=50,
+        n_eval=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
+        n_test=500 if data_dir == "/scratch/aneol/detr-mros/" else 70,
         num_workers=0,
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
@@ -185,8 +183,7 @@ def main(args):
         fs=128,
         matching_overlap=0.5,
         n_jobs=-1,
-        #n_records=2831 if data_dir == "/scratch/aneol/detr-mros/" else 355,
-        n_records=350,
+        n_records=2831 if data_dir == "/scratch/aneol/detr-mros/" else 355,
         picks=['c3', 'c4', 'eogl', 'eogr', 'chin', 'legl', 'legr', "nasal", "abdo", "thor"],
         transform=STFTTransform(fs=128, segment_size=int(4.0 * 128), step_size=int(0.5 * 128), nfft=1024,
                                 normalize=True),
@@ -196,7 +193,7 @@ def main(args):
     wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
     wandb.init(
         # set the wandb project where this run will be logged
-        project='Run with 4 GPU',
+        project='Run with 6 GPU',
 
         # track hyperparameters and run metadata
         config={
