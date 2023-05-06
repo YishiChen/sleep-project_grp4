@@ -29,9 +29,13 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 #SBATCH --gres=gpu:{gpus}
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem={memory}
+#SBATCH --propagate=STACK
 #SBATCH --output={log_path}/{jobname}.out
 #SBATCH --error={log_path}/{jobname}.err
 ##################################################
+
+# set open file limit
+ulimit -n 8192
 
 # Change this to correct directory
 cd $HOME/bachelor/sleep-project_grp4
