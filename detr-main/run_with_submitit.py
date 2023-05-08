@@ -20,7 +20,7 @@ def parse_args():
     parser.add_argument("--nodes", default=1, type=int, help="Number of nodes to request")
     parser.add_argument("--timeout", default=60*24*4, type=int, help="Duration of the job")
     parser.add_argument("--job_dir", default="", type=str, help="Job dir. Leave empty for automatic.")
-    parser.add_argument("--resume", default="/scratch/s203877/checkpoints/3365/checkpoint0019.pth", type=str, help="Job dir. Leave empty for automatic.")
+    #parser.add_argument("--resume", default="/scratch/s203877/checkpoints/3365/checkpoint0019.pth", type=str, help="resume path.")
     return parser.parse_args()
 
 
@@ -63,7 +63,7 @@ class Trainer(object):
         from pathlib import Path
 
         self.args.dist_url = get_init_file().as_uri()
-        checkpoint_file = os.path.join(self.args.output_dir, "checkpoint.pth")
+        checkpoint_file = os.path.join(self.args.output_dir, "checkpoint0019.pth")
         if os.path.exists(checkpoint_file):
             self.args.resume = checkpoint_file
         print("Requeuing ", self.args)
