@@ -65,7 +65,7 @@ class Trainer(object):
         from pathlib import Path
 
         self.args.dist_url = get_init_file().as_uri()
-        checkpoint_file = os.path.join("/scratch/s203877/3365/checkpoint0019.pth")
+        checkpoint_file = os.path.join("/scratch/s203877/checkpoint/3365/checkpoint0019.pth")
         if os.path.exists(checkpoint_file):
             self.args.resume = checkpoint_file
         print("Requeuing ", self.args)
