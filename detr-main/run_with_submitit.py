@@ -99,7 +99,7 @@ def main():
     timeout_min = args.timeout
 
     executor.update_parameters(
-        mem_gb=256,
+        mem_gb=228,
         gpus_per_node=num_gpus_per_node,
         tasks_per_node=num_gpus_per_node,  # one task per GPU
         cpus_per_task=2,
