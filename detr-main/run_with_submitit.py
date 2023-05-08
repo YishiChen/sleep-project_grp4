@@ -104,7 +104,6 @@ def main():
         cpus_per_task=2,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
-        nodelist="comp-gpu05"
     )
 
     executor.update_parameters(name="detr")
