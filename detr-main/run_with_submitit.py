@@ -20,6 +20,8 @@ def parse_args():
     parser.add_argument("--nodes", default=1, type=int, help="Number of nodes to request")
     parser.add_argument("--timeout", default=60*24*4, type=int, help="Duration of the job")
     parser.add_argument("--job_dir", default="", type=str, help="Job dir. Leave empty for automatic.")
+    parser.add_argument("--reservation", default="comp-gpu01", type=str, help="Job dir. Leave empty for automatic.")
+
     #parser.add_argument("--resume", default="/scratch/s203877/checkpoints/3365/checkpoint0019.pth", type=str, help="resume path.")
     return parser.parse_args()
 
