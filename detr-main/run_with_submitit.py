@@ -98,7 +98,7 @@ def main():
     timeout_min = args.timeout
 
     #specify specific node
-    submitit.AutoExecutor.update_parameters("w" = "comp-gpu05")
+    submitit.AutoExecutor.update_parameters("w=comp-gpu05")
 
     executor.update_parameters(
         mem_gb=256,
