@@ -4,15 +4,15 @@ import tempfile
 # fmt: off
 JOBS = [
     {
-        "jobname": "4_deep",
+        "jobname": "detr",
         "partition": "titans",
-        "reservation": "comp-gpu04",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
+        "reservation": "comp-gpu05",  # This is my GPU node, comment this line and remove line 27, if you wish to send the job out to all nodes
         "time": "4-00:00:00",  # Days-Hours:Minutes:Seconds
-        "ncpus": 4,  # Number of CPU cores
-        "gpus": 2,  # Number of GPUs
+        "ncpus": 2,  # Number of CPU cores
+        "gpus": 4,  # Number of GPUs
         "memory": "256G",  # This is total RAM, change this accordingly to use
-        "command": "python -m torch.distributed.launch --nproc_per_node=2  --use_env detr-main/main.py",
-        "log_path": "/scratch/s203877"  # Usually this is your scratch space
+        "command": "python -m torch.distributed.launch --nproc_per_node=4  --use_env detr-main/main.py --resume /scratch/s203877/checkpoints/3365/checkpoint0019.pth",
+        "log_path": "/scratch/s203877/run1"  # Usually this is your scratch space
 
     },
 ]
@@ -27,15 +27,12 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 #SBATCH -p {partition}
 #SBATCH --cpus-per-task={ncpus}
 #SBATCH --gres=gpu:{gpus}
-#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-node={gpus}
+#SBATCH --w={reservation}
 #SBATCH --mem={memory}
-#SBATCH --propagate=STACK
 #SBATCH --output={log_path}/{jobname}.out
 #SBATCH --error={log_path}/{jobname}.err
 ##################################################
-
-# set open file limit
-ulimit -n 8192
 
 # Change this to correct directory
 cd $HOME/bachelor/sleep-project_grp4
