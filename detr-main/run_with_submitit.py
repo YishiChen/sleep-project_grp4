@@ -106,7 +106,7 @@ def main():
     )
 
     executor.update_parameters(name="detr")
-    executor.update_parameters(slurm_nodelist="comp-gpu07")
+    executor.update_parameters(slurm_w="comp-gpu07")
 
 
     args.dist_url = get_init_file().as_uri()
