@@ -97,9 +97,6 @@ def main():
     nodes = args.nodes
     timeout_min = args.timeout
 
-    #specify specific node
-    submitit.AutoExecutor.update_parameters("w=comp-gpu05")
-
     executor.update_parameters(
         mem_gb=256,
         gpus_per_node=num_gpus_per_node,
@@ -107,6 +104,7 @@ def main():
         cpus_per_task=2,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
+        nodelist="comp-gpu05"
     )
 
     executor.update_parameters(name="detr")
