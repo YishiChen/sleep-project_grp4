@@ -52,7 +52,7 @@ class Trainer(object):
         self.args = args
 
     def __call__(self):
-        sys.path.append('/home/s203877/sleep-project_grp4/detr-main')
+        # sys.path.append('/home/s203877/sleep-project_grp4/detr-main')
         import main as detection
 
         self._setup_gpu_args()
