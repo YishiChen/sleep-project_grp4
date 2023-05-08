@@ -28,7 +28,7 @@ def submit_job(jobname, partition, time, reservation, ncpus, gpus, command, memo
 #SBATCH --cpus-per-task={ncpus}
 #SBATCH --gres=gpu:{gpus}
 #SBATCH --ntasks-per-node={gpus}
-#SBATCH -w={reservation}
+#SBATCH -w {reservation}
 #SBATCH --mem={memory}
 #SBATCH --output={log_path}/{jobname}.out
 #SBATCH --error={log_path}/{jobname}.err
