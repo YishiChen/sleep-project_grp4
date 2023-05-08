@@ -12,7 +12,7 @@ JOBS = [
         "gpus": 4,  # Number of GPUs
         "memory": "256G",  # This is total RAM, change this accordingly to use
         "command": "python -m torch.distributed.launch --nproc_per_node=4  --use_env detr-main/main.py --resume /scratch/s203877/checkpoints/3365/checkpoint0019.pth",
-        "log_path": "/scratch/s203877/run1"  # Usually this is your scratch space
+        "log_path": "/scratch/s203877/runs"  # Usually this is your scratch space
 
     },
 ]
