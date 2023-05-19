@@ -102,7 +102,7 @@ def main():
         mem_gb=128,
         gpus_per_node=num_gpus_per_node,
         tasks_per_node=num_gpus_per_node,  # one task per GPU
-        cpus_per_task=2,
+        cpus_per_task=1,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
         slurm_additional_parameters={"nodelist": "comp-gpu06"}
