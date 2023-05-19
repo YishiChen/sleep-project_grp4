@@ -17,7 +17,7 @@ import submitit
 def parse_args():
     detection_parser = detection.get_args_parser()
     parser = argparse.ArgumentParser("Submitit for detection", parents=[detection_parser])
-    parser.add_argument("--ngpus", default=6, type=int, help="Number of gpus to request on each node")
+    parser.add_argument("--ngpus", default=8, type=int, help="Number of gpus to request on each node")
     parser.add_argument("--nodes", default=1, type=int, help="Number of nodes to request")
     parser.add_argument("--timeout", default=60*24*4, type=int, help="Duration of the job")
     parser.add_argument("--job_dir", default="", type=str, help="Job dir. Leave empty for automatic.")
@@ -65,7 +65,7 @@ class Trainer(object):
         from pathlib import Path
 
         self.args.dist_url = get_init_file().as_uri()
-        checkpoint_file = os.path.join("/scratch/s203877/checkpoint/3546/checkpoint0049.pth")
+        checkpoint_file = os.path.join("/scratch/s203877/checkpoint/4009/checkpoint0069.pth")
         if True:
         #if os.path.exists(checkpoint_file):
             self.args.resume = checkpoint_file
@@ -105,7 +105,7 @@ def main():
         cpus_per_task=2,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
-        slurm_additional_parameters={"nodelist": "comp-gpu07"}
+        slurm_additional_parameters={"nodelist": "comp-gpu06"}
     )
 
     executor.update_parameters(name="detr")
