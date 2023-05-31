@@ -11,6 +11,7 @@ import wandb
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, DistributedSampler
+from eval_scores import eval_score
 
 #import datasets
 import util.misc as utils
