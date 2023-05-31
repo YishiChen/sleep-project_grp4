@@ -227,18 +227,11 @@ def main(args):
 
     # -------------------- CHANGE DATALOADER CLASS ------------------- #
 
-    
-
-
-    def set_worker_sharing_strategy(worker_id: int) -> None:
-        torch.multiprocessing.set_sharing_strategy("file_system")
-        torch.multiprocessing.set_start_method('forkserver')
-
 
     data_loader_train = DataLoader(dataset_train, batch_sampler=batch_sampler_train,
-                                   collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
+                                   collate_fn=collate, num_workers=0)
     data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
-                                 drop_last=False, collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
+                                 drop_last=False, collate_fn=collate, num_workers=0)
 
     #data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
 
@@ -306,18 +299,18 @@ def main(args):
         test_stats, coco_evaluator = evaluate(
             model, criterion, postprocessors, data_loader_val, base_ds, device, args.output_dir
         )
-        wandb.log({
-            "train_loss": train_stats['loss'],
-            "train_class_error": train_stats['class_error'],
-            "train_loss_bbox": train_stats['loss_bbox'],
-            "train_loss_giou": train_stats['loss_giou']
-        })
-        wandb.log({
-            "test_loss": test_stats['loss'],
-            "test_class_error": test_stats['class_error'],
-            "test_loss_bbox": test_stats['loss_bbox'],
-            "test_loss_giou": test_stats['loss_giou']
-        })
+#         wandb.log({
+#             "train_loss": train_stats['loss'],
+#             "train_class_error": train_stats['class_error'],
+#             "train_loss_bbox": train_stats['loss_bbox'],
+#             "train_loss_giou": train_stats['loss_giou']
+#         })
+#         wandb.log({
+#             "test_loss": test_stats['loss'],
+#             "test_class_error": test_stats['class_error'],
+#             "test_loss_bbox": test_stats['loss_bbox'],
+#             "test_loss_giou": test_stats['loss_giou']
+#         })
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      **{f'test_{k}': v for k, v in test_stats.items()},
