@@ -39,7 +39,7 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)
 
-        samples = samples[:, None, :, :]
+        #samples = samples[:, None, :, :]
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
