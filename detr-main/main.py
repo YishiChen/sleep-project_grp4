@@ -191,21 +191,21 @@ def main(args):
         #transform=None,
         scaling="robust",
     )
-    wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
-    wandb.init(
-        # set the wandb project where this run will be logged
-        project='Run with 6 GPU',
+#     wandb.login(key='5e435a892a1324586da2f4425116de5d843168f3')
+#     wandb.init(
+#         # set the wandb project where this run will be logged
+#         project='Run with 6 GPU',
 
-        # track hyperparameters and run metadata
-        config={
-            "lr": args.lr,
-            "lr_drop": args.lr_drop,
-            "architecture": "DETR",
-            "dataset": "MROS",
-            "epochs": args.epochs,
-            "batch_size": args.batch_size
-        }
-    )
+#         # track hyperparameters and run metadata
+#         config={
+#             "lr": args.lr,
+#             "lr_drop": args.lr_drop,
+#             "architecture": "DETR",
+#             "dataset": "MROS",
+#             "epochs": args.epochs,
+#             "batch_size": args.batch_size
+#         }
+#     )
 
     dm = SleepEventDataModule(**params)
     dm.setup('fit')
