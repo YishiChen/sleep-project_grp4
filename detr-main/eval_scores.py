@@ -79,7 +79,7 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         query_idx = indices[0][0]
         tgt_idx = indices[0][1]
 
-        m = np.ones(100)
+        m = np.ones(25)
         m[query_idx] = 0
 
         for c in out_prob[out_prob[m, :].argmax(-1) < 3].argmax(-1):
