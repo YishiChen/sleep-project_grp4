@@ -29,7 +29,7 @@ def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
     parser.add_argument('--lr', default=1e-5, type=float)
     parser.add_argument('--lr_backbone', default=1e-4, type=float)
-    parser.add_argument('--batch_size', default=12, type=int)
+    parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=150, type=int)
     parser.add_argument('--lr_drop', default=100, type=int)
@@ -176,7 +176,7 @@ def main(args):
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
         window_duration=600,  # seconds
-        cache_data=True,
+        cache_data=False,
         default_event_window_duration=[3],
         event_buffer_duration=3,
         factor_overlap=2,
@@ -238,7 +238,6 @@ def main(args):
                                    collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
     data_loader_val = DataLoader(dataset_val, args.batch_size, sampler=sampler_val,
                                  drop_last=False, collate_fn=collate, num_workers=0, worker_init_fn=set_worker_sharing_strategy)
-    print("LOLOLOOLO", torch.multiprocessing.get_sharing_strategy())
 
     #data_loader_train, data_loader_val = dm.train_dataloader(), dm.val_dataloader()
 
@@ -268,12 +267,16 @@ def main(args):
             lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
             args.start_epoch = checkpoint['epoch'] + 1
 
-    #if args.eval:
-        #test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
-        #                                     data_loader_val, base_ds, device, args.output_dir)
-        #if args.output_dir:
-        #    utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")
-        #return
+   if args.eval:
+        test_stats = eval_score(model, criterion, postprocessors,
+                                              data_loader_val, base_ds, device, args.output_dir, args, data_dir)
+
+        '''test_stats, coco_evaluator = evaluate(model, criterion, postprocessors,
+                                             data_loader_val, base_ds, device, args.output_dir)
+        if args.output_dir:
+            utils.save_on_master(coco_evaluator.coco_eval["bbox"].eval, output_dir / "eval.pth")'''
+
+        return
 
     print(args.distributed)
     print("Start training")
