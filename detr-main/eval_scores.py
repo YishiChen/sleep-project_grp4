@@ -20,8 +20,10 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
     model.eval()
     criterion.eval()
 
-    ma_conf_noiou = np.zeros((4,3))
-    conf_ma = np.zeros((4,3))
+    noiou = np.zeros((4,4))
+    iou3 = np.zeros((4,4))
+    iou5 = np.zeros((4,4))
+    iou7 = np.zeros((4,4))
 
     for s_idx, (samples, targets, records, *_) in enumerate(tqdm(data_loader)):
         if s_idx % 500 == 0:
@@ -39,7 +41,7 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
             dict_t = {'boxes': boxes, 'labels': labels}
             targets_new.append(dict_t)
 
-        #samples = samples[:, None, :, :]
+        samples = samples[:, None, :, :]
         samples = samples.to(device)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets_new]
         outputs = model(samples)
@@ -77,6 +79,17 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
         query_idx = indices[0][0]
         tgt_idx = indices[0][1]
 
+        m = np.ones(100)
+        m[query_idx] = 0
+
+        for c in out_prob[out_prob[m, :].argmax(-1) < 3].argmax(-1):
+            if c > 3:
+                c = 3
+            noiou[c, 3] += 1
+            iou3[c, 3] += 1
+            iou5[c, 3] += 1
+            iou7[c, 3] += 1
+
         giou = -cost_giou[query_idx, tgt_idx]
         labels = tgt_ids[tgt_idx]
         pred_labels = out_prob.argmax(-1)[query_idx]
@@ -87,16 +100,22 @@ def eval_score(model, criterion, postprocessors, data_loader, base_ds, device, o
             if pl > 3:
                 pl = 3
             if giou[i] >= 0.3:
-                conf_ma[pl, l] += 1
-            ma_conf_noiou[pl, l] += 1
+                iou3[pl, l] += 1
+            if giou[i] >= 0.5:
+                iou5[pl, l] += 1
+            if giou[i] >= 0.7:
+                iou7[pl, l] += 1
+            noiou[pl, l] += 1
 
-
-
-    if data_dir =="D:/10channel":
-        np.save('D:/predictions/' + args.backbone + 'n.npy', ma_conf_noiou)
-        np.save('D:/predictions/' + args.backbone + 'i.npy', conf_ma)
+    if data_dir == "D:/10channel":
+        np.save('D:/predictions/' + args.backbone + 'n.npy', noiou)
+        np.save('D:/predictions/' + args.backbone + '3.npy', iou3)
+        np.save('D:/predictions/' + args.backbone + '5.npy', iou5)
+        np.save('D:/predictions/' + args.backbone + '7.npy', iou7)
     else:
-        np.save('/scratch/s203877/' + args.backbone + 'n.npy', ma_conf_noiou)
-        np.save('/scratch/s203877/' + args.backbone + 'i.npy', conf_ma)
+        np.save('/scratch/s203877/' + args.backbone + 'n.npy', noiou)
+        np.save('/scratch/s203877/' + args.backbone + '3.npy', iou3)
+        np.save('/scratch/s203877/' + args.backbone + '5.npy', iou5)
+        np.save('/scratch/s203877/' + args.backbone + '7.npy', iou7)
 
     return 'fuck off'
