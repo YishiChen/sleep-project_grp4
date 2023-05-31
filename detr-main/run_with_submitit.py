@@ -17,7 +17,7 @@ import submitit
 def parse_args():
     detection_parser = detection.get_args_parser()
     parser = argparse.ArgumentParser("Submitit for detection", parents=[detection_parser])
-    parser.add_argument("--ngpus", default=7, type=int, help="Number of gpus to request on each node")
+    parser.add_argument("--ngpus", default=1, type=int, help="Number of gpus to request on each node")
     parser.add_argument("--nodes", default=1, type=int, help="Number of nodes to request")
     parser.add_argument("--timeout", default=60*24*4, type=int, help="Duration of the job")
     parser.add_argument("--job_dir", default="", type=str, help="Job dir. Leave empty for automatic.")
@@ -99,13 +99,13 @@ def main():
     timeout_min = args.timeout
 
     executor.update_parameters(
-        mem_gb=128,
+        mem_gb=228,
         gpus_per_node=num_gpus_per_node,
         tasks_per_node=num_gpus_per_node,  # one task per GPU
-        cpus_per_task=2,
+        cpus_per_task=26,
         nodes=nodes,
         timeout_min=timeout_min,  # max is 60 * 72
-        slurm_additional_parameters={"nodelist": "comp-gpu06"}
+        slurm_additional_parameters={"nodelist": "comp-gpu12"}
     )
 
     executor.update_parameters(name="detr")
