@@ -100,11 +100,11 @@ def get_args_parser():
     parser.add_argument('--resume', default='/scratch/s203877/checkpoint/5231/checkpoint0089.pth', help='resume from checkpoint')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
-    parser.add_argument('--eval', action='store_true')
+    parser.add_argument('--eval', default='True' action='store_true')
     parser.add_argument('--num_workers', default=0, type=int)
 
     # distributed training parameters
-    parser.add_argument('--world_size', default=6, type=int,
+    parser.add_argument('--world_size', default=1, type=int,
                         help='number of distributed processes')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
     parser.add_argument('--local_rank', default='0', help='just a dummy to start training')
