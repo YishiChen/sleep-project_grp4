@@ -99,7 +99,7 @@ def get_args_parser():
                         help='device to use for training / testing')
     parser.add_argument('--seed', default=42, type=int)
     #parser.add_argument('--resume', default='/scratch/s203877/checkpoint/5231/checkpoint0089.pth', help='resume from checkpoint')
-    parser.add_argument('--resume', defualt=None)
+    parser.add_argument('--resume', default='')
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
     parser.add_argument('--eval', action='store_true')
