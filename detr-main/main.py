@@ -28,7 +28,7 @@ from mros_data.utils import collate
 
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
-    parser.add_argument('--lr', default=1e-5, type=float)
+    parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lr_backbone', default=1e-4, type=float)
     parser.add_argument('--batch_size', default=1, type=int)
     parser.add_argument('--weight_decay', default=1e-4, type=float)
@@ -61,7 +61,7 @@ def get_args_parser():
                         help="Dropout applied in the transformer")
     parser.add_argument('--nheads', default=8, type=int,
                         help="Number of attention heads inside the transformer's attentions")
-    parser.add_argument('--num_queries', default=25, type=int,
+    parser.add_argument('--num_queries', default=100, type=int,
                         help="Number of query slots")
     parser.add_argument('--pre_norm', action='store_true')
 
@@ -84,7 +84,7 @@ def get_args_parser():
     parser.add_argument('--dice_loss_coef', default=0, type=float)
     parser.add_argument('--bbox_loss_coef', default=5, type=float)
     parser.add_argument('--giou_loss_coef', default=2, type=float)
-    parser.add_argument('--eos_coef', default=0.1, type=float,
+    parser.add_argument('--eos_coef', default=0.05, type=float,
                         help="Relative classification weight of the no-object class")
 
     # dataset parameters
@@ -98,10 +98,11 @@ def get_args_parser():
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
     parser.add_argument('--seed', default=42, type=int)
-    parser.add_argument('--resume', default='/scratch/s203877/checkpoint/5231/checkpoint0089.pth', help='resume from checkpoint')
+    #parser.add_argument('--resume', default='/scratch/s203877/checkpoint/5231/checkpoint0089.pth', help='resume from checkpoint')
+    parser.add_argument('--resume', defualt=None)
     parser.add_argument('--start_epoch', default=0, type=int, metavar='N',
                         help='start epoch')
-    parser.add_argument('--eval', default='True', action='store_true')
+    parser.add_argument('--eval', action='store_true')
     parser.add_argument('--num_workers', default=0, type=int)
 
     # distributed training parameters
@@ -172,7 +173,7 @@ def main(args):
         data_dir=data_dir,
         batch_size=args.batch_size,
         n_eval=200 if data_dir == "/scratch/aneol/detr-mros/" else 70,
-        n_test=2400 if data_dir == "/scratch/aneol/detr-mros/" else 70,
+        n_test=1631 if data_dir == "/scratch/aneol/detr-mros/" else 70,
         num_workers=0,
         seed=1338,
         events={"ar": "Arousal", "lm": "Leg Movements", "sdb": "Sleep-disordered breathing"},
